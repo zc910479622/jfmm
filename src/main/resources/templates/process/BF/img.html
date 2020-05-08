@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+<style>
+    tr{
+        height: 3em;
+    }
+    table thead tr th{
+        text-align: center;
+    }
+</style>
+<body>
+<div class="container">
+    <img style="width: 100%" th:src="'/SavePicture/getFileList?img_path='+${path}" >
+</div>
+
+<div th:include="include::footer"></div>
+</body>
+</html>

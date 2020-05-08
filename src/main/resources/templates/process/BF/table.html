@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+<style>
+    tr{
+        height: 3em;
+    }
+    table thead tr th{
+        text-align: center;
+    }
+</style>
+<body>
+<H1 align="center">浙江今飞凯达轮毂股份有限公司</H1>
+<H2 align="center">闲置模具报废申请单</H2>
+<div class="container">
+    <table style="margin: auto;width: 100%" border="1" cellspacing="0" cellpadding="0">
+        <thead>
+        <tr>
+            <th>事业部</th>
+            <th>工厂</th>
+            <th>客户</th>
+            <th>模具类型</th>
+            <th>模具型号</th>
+            <th>合模数</th>
+            <th>原值</th>
+            <th>净值</th>
+            <th>最后一次生产时间</th>
+            <th>申请报废原因</th>
+            <th>本业务员签字确认</th>
+            <th>零售业务人员确认</th>
+        </tr>
+        </thead>
+        <tbody >
+        <tr>
+            <td>合计</td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td>生产部</td>
+            <td colspan="9"></td>
+            <td >签字:</td>
+            <td >日期:</td>
+        </tr>
+        <tr>
+            <td rowspan="3">核算科</td>
+            <td colspan="5">回收利用部分残值</td>
+            <td colspan="4"></td>
+            <td rowspan="3">签字:</td>
+            <td rowspan="3">日期:</td>
+        </tr>
+        <tr>
+            <td colspan="5">报废料出售残值</td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td colspan="5">合计残值</td>
+            <td colspan="4"></td>
+        </tr>
+        <tr>
+            <td>营销部</td>
+            <td colspan="9">对订单情况进行确认:</td>
+            <td >签字:</td>
+            <td >日期:</td>
+        </tr>
+        <tr>
+            <td>资产部</td>
+            <td colspan="9">对报废要素进行确认:</td>
+            <td >签字:</td>
+            <td >日期:</td>
+        </tr>
+        <tr>
+            <td>财务部</td>
+            <td colspan="9">对原值,净值进行确认:</td>
+            <td colspan="2">签字: </td>
+        </tr>
+        <tr>
+            <td>厂长</td>
+            <td colspan="9"></td>
+            <td colspan="2">签字: </td>
+        </tr>
+        <tr>
+            <td>总经理意见</td>
+            <td colspan="9"></td>
+            <td colspan="2">签字: </td>
+        </tr>
+        <tr>
+            <td>董事长意见</td>
+            <td colspan="9"></td>
+            <td colspan="2">签字: </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:include="include::footer"></div>
+</body>
+<script th:inline="javascript">
+    var str = "";
+    var arr = [[${main}]];
+    $.each(arr,function (i,v) {
+        str+="<tr align='center'>" +
+            "<td></td>"+
+            "<td></td>"+
+            "<td></td>"+
+            "<td></td>"+
+            "<td>"+v.fNo+"</td>"+
+            "<td></td>"+
+            "<td></td>"+
+            "<td></td>"+
+            "<td></td>"+
+            "<td></td>"+
+            "<td></td>"+
+            "<td></td>"+
+            "</tr>"
+    })
+$("tbody").prepend(str)
+    function submitHandler() {
+        window.print();
+    }
+</script>
+</html>

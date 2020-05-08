@@ -1,0 +1,1152 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.IMainDao">
+    <resultMap id="ResultBase" type="com.jinfei.jfmm.model.Main">
+        <result property="f_id" column="f_id" jdbcType="VARCHAR"/>
+        <result property="f_name" column="f_name" jdbcType="VARCHAR"/>
+        <result property="model_id" column="model_id" jdbcType="VARCHAR"/>
+        <result property="cast_type_id" column="cast_type_id" jdbcType="VARCHAR"/>
+        <result property="make_fty_id" column="make_fty_id" jdbcType="VARCHAR"/>
+        <result property="heat_fty_id" column="heat_fty_id" jdbcType="VARCHAR"/>
+        <result property="mould_mater_id" column="mould_mater_id" jdbcType="VARCHAR"/>
+        <result property="usage_max" column="usage_max" jdbcType="INTEGER"/>
+        <result property="make_cost" column="make_cost" jdbcType="DECIMAL"/>
+        <result property="d1" column="d1" jdbcType="DATE"/>
+        <result property="d2" column="d2" jdbcType="DATE"/>
+        <result property="d3" column="d3" jdbcType="DATE"/>
+    </resultMap>
+
+    <resultMap id="ResultBaseTZ" type="com.jinfei.jfmm.model.mainTZ">
+        <result property="f_id" column="f_id" jdbcType="VARCHAR"/>
+        <result property="f_name" column="f_name" jdbcType="VARCHAR"/>
+        <result property="model_name" column="model_name" jdbcType="VARCHAR"/>
+        <result property="match_no" column="match_no" jdbcType="VARCHAR"/>
+        <result property="unit" column="unit" jdbcType="VARCHAR"/>
+        <result property="model_id" column="model_id" jdbcType="VARCHAR"/>
+        <result property="prop_mould_id" column="prop_mould_id" jdbcType="VARCHAR"/>
+        <result property="prop_mmd_id" column="prop_mmd_id" jdbcType="VARCHAR"/>
+        <result property="cast_type_id" column="cast_type_id" jdbcType="VARCHAR"/>
+        <result property="make_fty_id" column="make_fty_id" jdbcType="VARCHAR"/>
+        <result property="heat_fty_id" column="heat_fty_id" jdbcType="VARCHAR"/>
+        <result property="mould_mater_id" column="mould_mater_id" jdbcType="VARCHAR"/>
+        <result property="life_sum" column="life_sum" jdbcType="INTEGER"/>
+        <result property="usages" column="usages" jdbcType="INTEGER"/>
+        <result property="usage_max" column="usage_max" jdbcType="INTEGER"/>
+        <result property="make_cost" column="make_cost" jdbcType="DECIMAL"/>
+        <result property="d1" column="d1" jdbcType="DATE"/>
+        <result property="d2" column="d2" jdbcType="DATE"/>
+        <result property="d3" column="d3" jdbcType="DATE"/>
+        <result property="edit_user" column="edit_user" jdbcType="VARCHAR"/>
+        <result property="edit_time" column="edit_time" jdbcType="VARCHAR"/>
+        <result property="assets_state" column="assets_state" jdbcType="VARCHAR"/>
+        <result property="location" column="location" jdbcType="VARCHAR"/>
+        <result property="trans_state" column="trans_state" jdbcType="VARCHAR"/>
+        <result property="is_in_library" column="is_in_library" jdbcType="VARCHAR"/>
+        <result property="happen_time" column="happen_time" jdbcType="VARCHAR"/>
+        <result property="request_org" column="request_org" jdbcType="VARCHAR"/>
+        <result property="accep_into_factory_no" column="accep_into_factory_no" jdbcType="VARCHAR"/>
+        <result property="accep_no" column="accep_no" jdbcType="VARCHAR"/>
+        <result property="transfer_order_no" column="transfer_order_no" jdbcType="VARCHAR"/>
+        <result property="accep_finish_time" column="accep_finish_time" jdbcType="VARCHAR"/>
+        <result property="trial_start_time" column="trial_start_time" jdbcType="VARCHAR"/>
+        <result property="trial_finish_time" column="trial_finish_time" jdbcType="VARCHAR"/>
+        <result property="last_upkeep_time" column="last_upkeep_time" jdbcType="VARCHAR"/>
+        <result property="scrap_time" column="scrap_time" jdbcType="VARCHAR"/>
+        <result property="reuse_time" column="reuse_time" jdbcType="VARCHAR"/>
+        <result property="prod_classify_id" column="prod_classify_id" jdbcType="VARCHAR"/>
+        <result property="prod_spec_id" column="prod_spec_id" jdbcType="VARCHAR"/>
+        <result property="classify_no" column="classify_no" jdbcType="VARCHAR"/>
+        <result property="mould_spec_id" column="mould_spec_id" jdbcType="VARCHAR"/>
+        <result property="f_no" column="f_no" jdbcType="VARCHAR"/>
+        <result property="mmd_cast_type_id" column="mmd_cast_type_id" jdbcType="VARCHAR"/>
+        <result property="mould_state" column="mould_state" jdbcType="VARCHAR"/>
+        <result property="mmd_name" column="mmd_name" jdbcType="VARCHAR"/>
+        <result property="mmd_prod_classify_id" column="mmd_prod_classify_id" jdbcType="VARCHAR"/>
+        <result property="spec_id" column="spec_id" jdbcType="VARCHAR"/>
+        <result property="cust_id" column="cust_id" jdbcType="VARCHAR"/>
+        <result property="org_name" column="org_name" jdbcType="VARCHAR"/>
+        <result property="location_org_name" column="location_org_name" jdbcType="VARCHAR"/>
+        <result property="seat_id" column="seat_id" jdbcType="VARCHAR"/>
+        <result property="rack_position" column="rack_position" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <resultMap id="ResultBasePC" type="com.jinfei.jfmm.model.prodCate">
+        <result property="prod_classify_id" column="prod_classify_id" jdbcType="VARCHAR"/>
+        <result property="f_name" column="f_name" jdbcType="VARCHAR"/>
+        <result property="classify_no" column="classify_no" jdbcType="VARCHAR"/>
+        <result property="NUMS" column="NUMS" jdbcType="VARCHAR"/>
+        <result property="assets_state" column="assets_state" jdbcType="VARCHAR"/>
+        <result property="location" column="location" jdbcType="VARCHAR"/>
+        <result property="cost" column="cost" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="getTotal" resultType="java.lang.Integer" parameterType="com.jinfei.jfmm.model.mainTZ">
+        SELECT
+       count(0)
+        FROM
+        b_main bm
+        LEFT JOIN b_model bmd ON bm.model_id = bmd.f_id
+        LEFT JOIN m_main mm ON mm.f_id = bm.prop_mould_id
+        LEFT JOIN m_model mmd ON mm.model_id = mmd.f_id
+        <where>
+            <trim suffixOverrides="and" prefixOverrides="and">
+                <if test="is_pop = true">
+                    BM.trans_state is null and
+                </if>
+                <if test="f_id != null and f_id != ''">
+                    bm.f_id = #{f_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="f_name != null and f_name != ''">
+                    bm.f_name = #{f_name,jdbcType=VARCHAR} and
+                </if>
+                <if test="match_no != null and match_no != ''">
+                    bm.match_no like concat('%',#{match_no,jdbcType=VARCHAR},'%') and
+                </if>
+                <if test="model_id != null and model_id != ''">
+                    bm.model_id = #{model_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="model_name != null and model_name != ''">
+                    bmd.f_name like concat('%',#{model_name,jdbcType=VARCHAR},'%') and
+                </if>
+                <if test="cast_type_id != null and cast_type_id != ''">
+                    bm.cast_type_id = #{cast_type_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="make_fty_id != null and make_fty_id != ''">
+                    bm.make_fty_id = #{make_fty_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="heat_fty_id != null and heat_fty_id != ''">
+                    bm.heat_fty_id = #{heat_fty_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="mould_mater_id != null and mould_mater_id != ''">
+                    bm.mould_mater_id = #{mould_mater_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="usage_max != null">
+                    bm.usage_max = #{usage_max,jdbcType=INTEGER} and
+                </if>
+                <if test="make_cost != null">
+                    bm.make_cost = #{make_cost,jdbcType=DECIMAL} and
+                </if>
+                <if test="d1 != null">
+                    bm.d1 = #{d1,jdbcType=DATE} and
+                </if>
+                <if test="d2 != null">
+                    bm.d2 = #{d2,jdbcType=DATE} and
+                </if>
+                <if test="d3 != null">
+                    bm.d3 = #{d3,jdbcType=DATE} and
+                </if>
+                <if test="f_no != null and f_no != ''">
+                    mm.f_no like concat('%',#{f_no,jdbcType=VARCHAR},'%') and
+                </if>
+                <if test="mmd_name != null and mmd_name != ''">
+                    mmd.f_name like concat('%',#{mmd_name,jdbcType=VARCHAR},'%') and
+                </if>
+                <if test="location != null and location != ''">
+                    bm.location = #{location,jdbcType=VARCHAR} and
+                </if>
+                <if test="rack_position != null and rack_position != ''">
+                    bm.rack_position is null and
+                </if>
+            </trim>
+        </where>
+    </select>
+
+    <select id="selectTZAll" resultMap="ResultBaseTZ" parameterType="com.jinfei.jfmm.model.mainTZ">
+        SELECT
+        bm.*,
+        bmd.f_name as model_name,
+        bmd.prod_classify_id,
+        bmd.prod_spec_id,
+        bmd.classify_no,
+        bmd.mould_spec_id,
+        mm.f_no,
+        mm.cast_type_id as mmd_cast_type_id,
+        mm.mould_state,
+        mmd.f_name as mmd_name,
+        mmd.prod_classify_id as mmd_prod_classify_id,
+        mmd.spec_id,
+        mmd.cust_id,
+        (select f_name from a_org where f_id = bm.request_org) as org_name,
+        (select f_name from a_org where f_id = bm.location) as location_org_name
+        FROM
+        b_main bm
+        LEFT JOIN b_model bmd ON bm.model_id = bmd.f_id
+        LEFT JOIN m_main mm ON mm.f_id = bm.prop_mould_id
+        LEFT JOIN m_model mmd ON mm.model_id = mmd.f_id
+        <where>
+            <trim suffixOverrides="and" prefixOverrides="and">
+                <if test="is_pop">
+                    BM.trans_state is null and
+                </if>
+                <if test="f_id != null and f_id != ''">
+                    bm.f_id = #{f_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="f_name != null and f_name != ''">
+                    bm.f_name = #{f_name,jdbcType=VARCHAR} and
+                </if>
+                <if test="match_no != null and match_no != ''">
+                    bm.match_no like concat('%',#{match_no,jdbcType=VARCHAR},'%') and
+                </if>
+                <if test="model_id != null and model_id != ''">
+                    bm.model_id = #{model_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="cast_type_id != null and cast_type_id != ''">
+                    bm.cast_type_id = #{cast_type_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="make_fty_id != null and make_fty_id != ''">
+                    bm.make_fty_id = #{make_fty_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="heat_fty_id != null and heat_fty_id != ''">
+                    bm.heat_fty_id = #{heat_fty_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="mould_mater_id != null and mould_mater_id != ''">
+                    bm.mould_mater_id = #{mould_mater_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="usage_max != null">
+                    bm.usage_max = #{usage_max,jdbcType=INTEGER} and
+                </if>
+                <if test="make_cost != null">
+                    bm.make_cost = #{make_cost,jdbcType=DECIMAL} and
+                </if>
+                <if test="d1 != null">
+                    bm.d1 = #{d1,jdbcType=DATE} and
+                </if>
+                <if test="d2 != null">
+                    bm.d2 = #{d2,jdbcType=DATE} and
+                </if>
+                <if test="d3 != null">
+                    bm.d3 = #{d3,jdbcType=DATE} and
+                </if>
+                <if test="f_no != null and f_no != ''">
+                    mm.f_no like concat('%',#{f_no,jdbcType=VARCHAR},'%') and
+                </if>
+                <if test="mmd_name != null and mmd_name != ''">
+                    mmd.f_name like concat('%',#{mmd_name,jdbcType=VARCHAR},'%') and
+                </if>
+                <if test="model_name != null and model_name != ''">
+                    bmd.f_name like concat('%',#{model_name,jdbcType=VARCHAR},'%') and
+                </if>
+                <if test="location != null and location != ''">
+                    bm.location = #{location,jdbcType=VARCHAR} and
+                </if>
+                <if test="rack_position != null and rack_position != ''">
+                    bm.rack_position is null
+                </if>
+
+            </trim>
+        </where>
+        <if test="orderByColumn!=null">
+            order by #{orderByColumn} #{isAsc}
+        </if>
+        <if test="offset!=null and pageSize!=null">
+            limit #{offset},#{pageSize}
+        </if>
+    </select>
+
+    <select id="selectTZByMouldId" resultMap="ResultBaseTZ" parameterType="java.lang.String">
+    SELECT
+        bm.f_id,
+        bm.f_name,
+        bm.match_no,
+        mmc.f_name AS mmd_name
+    FROM
+        (
+    SELECT
+        mm.comp_parts,
+        mm.f_no,
+        mmc.m_main_id,
+        mmc.b_match_no,
+        mm.cast_type_id,
+        mmd.f_name,
+        mmd.prod_classify_id,
+        prod_spec_id,
+        spec_id
+    FROM
+        m_match mmc
+        LEFT JOIN m_main mm ON mmc.m_main_id = mm.f_id
+        LEFT JOIN m_model mmd ON mm.model_id = mmd.f_id
+    WHERE
+        mm.f_id = #{mouldID,jdbcType=VARCHAR}
+        ) mmc
+        LEFT JOIN (
+    SELECT
+        bm.*,
+        bmd.prod_classify_id,
+        bmd.prod_spec_id,
+        bmd.mould_spec_id,
+        bmd.classify_no
+    FROM
+        b_main bm
+        LEFT JOIN b_model bmd ON bm.model_id = bmd.f_id
+        ) bm ON bm.match_no LIKE concat( '%', mmc.b_match_no, '%' )
+        AND bm.cast_type_id = mmc.cast_type_id
+        AND bm.prod_classify_id = mmc.prod_classify_id
+        AND bm.prod_spec_id = mmc.prod_spec_id
+        AND bm.mould_spec_id = mmc.spec_id
+        GROUP BY match_no
+    </select>
+
+    <select id="selectByMould" resultMap="ResultBaseTZ" parameterType="com.jinfei.jfmm.model.SelectByMould">
+        SELECT
+             bm.*,
+             bmd.f_name as model_name,
+             bmd.prod_classify_id,
+             bmd.prod_spec_id,
+             bmd.classify_no,
+             bmd.mould_spec_id,
+             mm.f_no,
+             mm.cast_type_id as mmd_cast_type_id,
+             mm.mould_state,
+             mmd.f_name as mmd_name,
+             mmd.prod_classify_id as mmd_prod_classify_id,
+             mmd.spec_id,
+             mmd.cust_id,
+            ( SELECT f_name FROM a_org WHERE f_id = bm.request_org ) AS org_name,
+            ( SELECT f_name FROM a_org WHERE f_id = bm.location ) AS location_org_name
+        FROM
+            m_main MM
+            LEFT JOIN m_match MMC ON MM.f_id = MMC.m_main_id
+            LEFT JOIN m_model MMD ON MM.model_id = MMD.f_id
+            LEFT JOIN b_main BM ON FIND_IN_SET( BM.match_no, MMC.b_match_no )
+            LEFT JOIN b_model bmd ON bm.model_id = bmd.f_id
+        WHERE
+            BM.trans_state is null
+            and MMD.prod_classify_id = BMD.prod_classify_id
+            AND mm.f_id =  #{mould_id,jdbcType=VARCHAR}
+            AND bmd.classify_no =  #{classify_no,jdbcType=VARCHAR}
+    </select>
+
+    <select id="getTotalByMould" resultType="java.lang.Integer" parameterType="com.jinfei.jfmm.model.SelectByMould">
+        SELECT
+            count(0)
+        FROM
+            m_main MM
+            LEFT JOIN m_match MMC ON MM.f_id = MMC.m_main_id
+            LEFT JOIN m_model MMD ON MM.model_id = MMD.f_id
+            LEFT JOIN b_main BM ON FIND_IN_SET( BM.match_no, MMC.b_match_no )
+            LEFT JOIN b_model bmd ON bm.model_id = bmd.f_id
+        WHERE
+            BM.trans_state is null
+            AND MMD.prod_classify_id = BMD.prod_classify_id
+            AND mm.f_id =  #{mould_id,jdbcType=VARCHAR}
+            AND bmd.classify_no =  #{classify_no,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectAll" resultMap="ResultBase" parameterType="com.jinfei.jfmm.model.Main">
+        select * from b_main
+        <where>
+            <trim suffixOverrides="and" prefixOverrides="and">
+                <if test="f_id != null and f_id != ''">
+                    f_id = #{f_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="f_name != null and f_name != ''">
+                    f_name = #{f_name,jdbcType=VARCHAR} and
+                </if>
+                <if test="model_id != null and model_id != ''">
+                    model_id = #{model_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="cast_type_id != null and cast_type_id != ''">
+                    cast_type_id = #{cast_type_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="make_fty_id != null and make_fty_id != ''">
+                    make_fty_id = #{make_fty_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="heat_fty_id != null and heat_fty_id != ''">
+                    heat_fty_id = #{heat_fty_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="mould_mater_id != null and mould_mater_id != ''">
+                    mould_mater_id = #{mould_mater_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="usage_max != null">
+                    usage_max = #{usage_max,jdbcType=INTEGER} and
+                </if>
+                <if test="make_cost != null">
+                    make_cost = #{make_cost,jdbcType=DECIMAL} and
+                </if>
+                <if test="d1 != null">
+                    d1 = #{d1,jdbcType=DATE} and
+                </if>
+                <if test="d2 != null">
+                    d2 = #{d2,jdbcType=DATE} and
+                </if>
+                <if test="d3 != null">
+                    d3 = #{d3,jdbcType=DATE} and
+                </if>
+            </trim>
+        </where>
+        <if test="orderByColumn!=null">
+            order by #{orderByColumn} #{isAsc}
+        </if>
+    </select>
+
+    <insert id="add" parameterType="com.jinfei.jfmm.model.Main">
+        insert into b_main
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="f_id != null">
+                f_id,
+            </if>
+            <if test="f_name != null">
+                f_name,
+            </if>
+            <if test="model_id != null">
+                model_id,
+            </if>
+            <if test="cast_type_id != null">
+                cast_type_id,
+            </if>
+            <if test="make_fty_id != null">
+                make_fty_id,
+            </if>
+            <if test="heat_fty_id != null">
+                heat_fty_id,
+            </if>
+            <if test="mould_mater_id != null">
+                mould_mater_id,
+            </if>
+            <if test="usage_max != null">
+                usage_max,
+            </if>
+            <if test="make_cost != null">
+                make_cost,
+            </if>
+            <if test="d1 != null">
+                d1,
+            </if>
+            <if test="d2 != null">
+                d2,
+            </if>
+            <if test="d3 != null">
+                d3,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="f_id != null">
+                #{f_id,jdbcType=VARCHAR},
+            </if>
+            <if test="f_name != null">
+                #{f_name,jdbcType=VARCHAR},
+            </if>
+            <if test="model_id != null">
+                #{model_id,jdbcType=VARCHAR},
+            </if>
+            <if test="cast_type_id != null">
+                #{cast_type_id,jdbcType=VARCHAR},
+            </if>
+            <if test="make_fty_id != null">
+                #{make_fty_id,jdbcType=VARCHAR},
+            </if>
+            <if test="heat_fty_id != null">
+                #{heat_fty_id,jdbcType=VARCHAR},
+            </if>
+            <if test="mould_mater_id != null">
+                #{mould_mater_id,jdbcType=VARCHAR},
+            </if>
+            <if test="usage_max != null">
+                #{usage_max,jdbcType=INTEGER},
+            </if>
+            <if test="make_cost != null">
+                #{make_cost,jdbcType=DECIMAL},
+            </if>
+            <if test="d1 != null">
+                #{d1,jdbcType=DATE},
+            </if>
+            <if test="d2 != null">
+                #{d2,jdbcType=DATE},
+            </if>
+            <if test="d3 != null">
+                #{d3,jdbcType=DATE},
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="addMainTZ" parameterType="com.jinfei.jfmm.model.mainTZ">
+        insert into b_main
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="f_id!=null">
+                f_id,
+            </if>
+            <if test="f_name!=null">
+                f_name,
+            </if>
+            <if test="match_no!=null">
+                match_no,
+            </if>
+            <if test="model_id!=null">
+                model_id,
+            </if>
+            <if test="unit!=null">
+                unit,
+            </if>
+            <if test="prop_mould_id!=null">
+                prop_mould_id,
+            </if>
+            <if test="cast_type_id!=null">
+                cast_type_id,
+            </if>
+            <if test="make_fty_id!=null">
+                make_fty_id,
+            </if>
+            <if test="heat_fty_id!=null">
+                heat_fty_id,
+            </if>
+            <if test="mould_mater_id!=null">
+                mould_mater_id,
+            </if>
+            <if test="life_sum!=null">
+                life_sum,
+            </if>
+            <if test="usages!=null">
+                usages,
+            </if>
+            <if test="usage_max!=null">
+                usage_max,
+            </if>
+            <if test="make_cost!=null">
+                make_cost,
+            </if>
+            <if test="d1!=null and d1 != ''">
+                d1,
+            </if>
+            <if test="d2!=null and d2 != ''">
+                d2,
+            </if>
+            <if test="d3!=null and d3 != ''">
+                d3,
+            </if>
+            <if test="assets_state!=null">
+                assets_state,
+            </if>
+            <if test="location!=null">
+                location,
+            </if>
+            <if test="trans_state!=null">
+                trans_state,
+            </if>
+            <if test="is_in_library!=null">
+                is_in_library,
+            </if>
+            <if test="happen_time!=null and happen_time != ''">
+                happen_time,
+            </if>
+            <if test="request_org!=null">
+                request_org,
+            </if>
+            <if test="accep_into_factory_no!=null">
+                accep_into_factory_no,
+            </if>
+            <if test="accep_no!=null">
+                accep_no,
+            </if>
+            <if test="transfer_order_no!=null">
+                transfer_order_no,
+            </if>
+            <if test="accep_finish_time!=null and accep_finish_time != ''">
+                accep_finish_time,
+            </if>
+            <if test="trial_start_time!=null and trial_start_time != ''">
+                trial_start_time,
+            </if>
+            <if test="trial_finish_time!=null and trial_finish_time != ''">
+                trial_finish_time,
+            </if>
+            <if test="last_upkeep_time!=null and last_upkeep_time != ''">
+                last_upkeep_time,
+            </if>
+            <if test="scrap_time!=null and scrap_time != ''">
+                scrap_time,
+            </if>
+            <if test="reuse_time!=null and reuse_time != ''">
+                reuse_time,
+            </if>
+            <if test="edit_user!=null">
+                edit_user,
+            </if>
+            <if test="edit_time!=null">
+                edit_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="f_id!=null">
+                #{f_id,jdbcType=VARCHAR},
+            </if>
+            <if test="f_name!=null">
+                #{f_name,jdbcType=VARCHAR},
+            </if>
+            <if test="match_no!=null">
+                #{match_no,jdbcType=VARCHAR},
+            </if>
+            <if test="model_id!=null">
+                #{model_id,jdbcType=VARCHAR},
+            </if>
+            <if test="unit!=null">
+                #{unit,jdbcType=VARCHAR},
+            </if>
+            <if test="prop_mould_id!=null">
+                #{prop_mould_id,jdbcType=VARCHAR},
+            </if>
+            <if test="cast_type_id!=null">
+                #{cast_type_id,jdbcType=VARCHAR},
+            </if>
+            <if test="make_fty_id!=null">
+                #{make_fty_id,jdbcType=VARCHAR},
+            </if>
+            <if test="heat_fty_id!=null">
+                #{heat_fty_id,jdbcType=VARCHAR},
+            </if>
+            <if test="mould_mater_id!=null">
+                #{mould_mater_id,jdbcType=VARCHAR},
+            </if>
+            <if test="life_sum!=null">
+                #{life_sum,jdbcType=VARCHAR},
+            </if>
+            <if test="usages!=null">
+                #{usages,jdbcType=INTEGER},
+            </if>
+            <if test="usage_max!=null">
+                #{usage_max,jdbcType=INTEGER},
+            </if>
+            <if test="make_cost!=null">
+                #{make_cost,jdbcType=DECIMAL},
+            </if>
+            <if test="d1!=null and d1 != ''">
+                #{d1,jdbcType=VARCHAR},
+            </if>
+            <if test="d2!=null and d2 != ''">
+                #{d2,jdbcType=VARCHAR},
+            </if>
+            <if test="d3!=null and d3 != ''">
+                #{d3,jdbcType=VARCHAR},
+            </if>
+            <if test="assets_state!=null">
+                #{assets_state,jdbcType=VARCHAR},
+            </if>
+            <if test="location!=null">
+                #{location,jdbcType=VARCHAR},
+            </if>
+            <if test="trans_state!=null">
+                #{trans_state,jdbcType=VARCHAR},
+            </if>
+            <if test="is_in_library!=null">
+                #{is_in_library,jdbcType=VARCHAR},
+            </if>
+            <if test="happen_time!=null and happen_time != ''">
+                #{happen_time,jdbcType=DATE},
+            </if>
+            <if test="request_org!=null">
+                #{request_org,jdbcType=VARCHAR},
+            </if>
+            <if test="accep_into_factory_no!=null">
+                #{accep_into_factory_no,jdbcType=VARCHAR},
+            </if>
+            <if test="accep_no!=null">
+                #{accep_no,jdbcType=VARCHAR},
+            </if>
+            <if test="transfer_order_no!=null">
+                #{transfer_order_no,jdbcType=VARCHAR},
+            </if>
+            <if test="accep_finish_time!=null and accep_finish_time != ''">
+                #{accep_finish_time,jdbcType=DATE},
+            </if>
+            <if test="trial_start_time!=null and trial_start_time != ''">
+                #{trial_start_time,jdbcType=DATE},
+            </if>
+            <if test="trial_finish_time!=null and trial_finish_time != ''">
+                #{trial_finish_time,jdbcType=DATE},
+            </if>
+            <if test="last_upkeep_time!=null and last_upkeep_time != ''">
+                #{last_upkeep_time,jdbcType=DATE},
+            </if>
+            <if test="scrap_time!=null and scrap_time != ''">
+                #{scrap_time,jdbcType=DATE},
+            </if>
+            <if test="reuse_time!=null and reuse_time != ''">
+                #{reuse_time,jdbcType=DATE},
+            </if>
+            <if test="edit_user!=null">
+                #{edit_user,jdbcType=VARCHAR},
+            </if>
+            <if test="edit_time!=null">
+                #{edit_time,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="addMainTZs" parameterType="java.util.ArrayList">
+        <foreach item="item" collection="list" separator=";" index="">
+            insert into b_main
+            <trim prefix="(" suffix=")" suffixOverrides=",">
+                <if test="item.f_id!=null">
+                    f_id,
+                </if>
+                <if test="item.f_name!=null">
+                    f_name,
+                </if>
+                <if test="item.match_no!=null">
+                    match_no,
+                </if>
+                <if test="item.model_id!=null">
+                    model_id,
+                </if>
+                <if test="item.unit!=null">
+                    unit,
+                </if>
+                <if test="item.prop_mould_id!=null">
+                    prop_mould_id,
+                </if>
+                <if test="item.cast_type_id!=null">
+                    cast_type_id,
+                </if>
+                <if test="item.make_fty_id!=null">
+                    make_fty_id,
+                </if>
+                <if test="item.heat_fty_id!=null">
+                    heat_fty_id,
+                </if>
+                <if test="item.mould_mater_id!=null">
+                    mould_mater_id,
+                </if>
+                <if test="item.life_sum!=null">
+                    life_sum,
+                </if>
+                <if test="item.usages!=null">
+                    usages,
+                </if>
+                <if test="item.usage_max!=null">
+                    usage_max,
+                </if>
+                <if test="item.make_cost!=null">
+                    make_cost,
+                </if>
+                <if test="item.d1!=null and item.d1 != ''">
+                    d1,
+                </if>
+                <if test="item.d2!=null and item.d2 != ''">
+                    d2,
+                </if>
+                <if test="item.d3!=null and item.d3 != ''">
+                    d3,
+                </if>
+                <if test="item.assets_state!=null">
+                    assets_state,
+                </if>
+                <if test="item.location!=null">
+                    location,
+                </if>
+                <if test="item.trans_state!=null and item.trans_state!=''">
+                    trans_state,
+                </if>
+                <if test="item.is_in_library!=null">
+                    is_in_library,
+                </if>
+                <if test="item.happen_time!=null and item.happen_time != ''">
+                    happen_time,
+                </if>
+                <if test="item.request_org!=null">
+                    request_org,
+                </if>
+                <if test="item.accep_into_factory_no!=null">
+                    accep_into_factory_no,
+                </if>
+                <if test="item.accep_no!=null">
+                    accep_no,
+                </if>
+                <if test="item.transfer_order_no!=null">
+                    transfer_order_no,
+                </if>
+                <if test="item.accep_finish_time!=null and item.accep_finish_time != ''">
+                    accep_finish_time,
+                </if>
+                <if test="item.trial_start_time!=null and item.trial_start_time != ''">
+                    trial_start_time,
+                </if>
+                <if test="item.trial_finish_time!=null and item.trial_finish_time != ''">
+                    trial_finish_time,
+                </if>
+                <if test="item.last_upkeep_time!=null and item.last_upkeep_time != ''">
+                    last_upkeep_time,
+                </if>
+                <if test="item.scrap_time!=null and item.scrap_time != ''">
+                    scrap_time,
+                </if>
+                <if test="item.reuse_time!=null and item.reuse_time != ''">
+                    reuse_time,
+                </if>
+                <if test="item.edit_user!=null">
+                    edit_user,
+                </if>
+                <if test="item.edit_time!=null">
+                    edit_time,
+                </if>
+            </trim>
+            <trim prefix="values(" suffix=")" suffixOverrides=",">
+                <if test="item.f_id!=null">
+                    #{item.f_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.f_name!=null">
+                    #{item.f_name,jdbcType=VARCHAR},
+                </if>
+                <if test="item.match_no!=null">
+                    #{item.match_no,jdbcType=VARCHAR},
+                </if>
+                <if test="item.model_id!=null">
+                    #{item.model_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.unit!=null">
+                    #{item.unit,jdbcType=VARCHAR},
+                </if>
+                <if test="item.prop_mould_id!=null">
+                    #{item.prop_mould_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.cast_type_id!=null">
+                    #{item.cast_type_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.make_fty_id!=null">
+                    #{item.make_fty_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.heat_fty_id!=null">
+                    #{item.heat_fty_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.mould_mater_id!=null">
+                    #{item.mould_mater_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.life_sum!=null">
+                    #{item.life_sum,jdbcType=VARCHAR},
+                </if>
+                <if test="item.usages!=null">
+                    #{item.usages,jdbcType=INTEGER},
+                </if>
+                <if test="item.usage_max!=null">
+                    #{item.usage_max,jdbcType=INTEGER},
+                </if>
+                <if test="item.make_cost!=null">
+                    #{item.make_cost,jdbcType=DECIMAL},
+                </if>
+                <if test="item.d1!=null and item.d1 != ''">
+                    #{item.d1,jdbcType=VARCHAR},
+                </if>
+                <if test="item.d2!=null and item.d2 != ''">
+                    #{item.d2,jdbcType=VARCHAR},
+                </if>
+                <if test="item.d3!=null and item.d3 != ''">
+                    #{item.d3,jdbcType=VARCHAR},
+                </if>
+                <if test="item.assets_state!=null">
+                    #{item.assets_state,jdbcType=VARCHAR},
+                </if>
+                <if test="item.location!=null">
+                    #{item.location,jdbcType=VARCHAR},
+                </if>
+                <if test="item.trans_state!=null and item.trans_state!=''">
+                    #{item.trans_state,jdbcType=VARCHAR},
+                </if>
+                <if test="item.is_in_library!=null">
+                    #{item.is_in_library,jdbcType=VARCHAR},
+                </if>
+                <if test="item.happen_time!=null and item.happen_time != ''">
+                    #{item.happen_time,jdbcType=DATE},
+                </if>
+                <if test="item.request_org!=null">
+                    #{item.request_org,jdbcType=VARCHAR},
+                </if>
+                <if test="item.accep_into_factory_no!=null">
+                    #{item.accep_into_factory_no,jdbcType=VARCHAR},
+                </if>
+                <if test="item.accep_no!=null">
+                    #{item.accep_no,jdbcType=VARCHAR},
+                </if>
+                <if test="item.transfer_order_no!=null">
+                    #{item.transfer_order_no,jdbcType=VARCHAR},
+                </if>
+                <if test="item.accep_finish_time!=null and item.accep_finish_time != ''">
+                    #{item.accep_finish_time,jdbcType=DATE},
+                </if>
+                <if test="item.trial_start_time!=null and item.trial_start_time != ''">
+                    #{item.trial_start_time,jdbcType=DATE},
+                </if>
+                <if test="item.trial_finish_time!=null and item.trial_finish_time != ''">
+                    #{item.trial_finish_time,jdbcType=DATE},
+                </if>
+                <if test="item.last_upkeep_time!=null and item.last_upkeep_time != ''">
+                    #{item.last_upkeep_time,jdbcType=DATE},
+                </if>
+                <if test="item.scrap_time!=null and item.scrap_time != ''">
+                    #{item.scrap_time,jdbcType=DATE},
+                </if>
+                <if test="item.reuse_time!=null and item.reuse_time != ''">
+                    #{item.reuse_time,jdbcType=DATE},
+                </if>
+                <if test="item.edit_user!=null">
+                    #{item.edit_user,jdbcType=VARCHAR},
+                </if>
+                <if test="item.edit_time!=null">
+                    #{item.edit_time,jdbcType=TIMESTAMP},
+                </if>
+            </trim>
+        </foreach>
+    </insert>
+
+    <update id="edit" parameterType="com.jinfei.jfmm.model.Main">
+        update b_main
+        <set>
+            <if test="f_name != null">
+                f_name = #{f_name,jdbcType=VARCHAR},
+            </if>
+            <if test="model_id != null">
+                model_id = #{model_id,jdbcType=VARCHAR},
+            </if>
+            <if test="cast_type_id != null">
+                cast_type_id = #{cast_type_id,jdbcType=VARCHAR},
+            </if>
+            <if test="make_fty_id != null">
+                make_fty_id = #{make_fty_id,jdbcType=VARCHAR},
+            </if>
+            <if test="heat_fty_id != null">
+                heat_fty_id = #{heat_fty_id,jdbcType=VARCHAR},
+            </if>
+            <if test="mould_mater_id != null">
+                mould_mater_id = #{mould_mater_id,jdbcType=VARCHAR},
+            </if>
+            <if test="usage_max != null">
+                usage_max = #{usage_max,jdbcType=INTEGER},
+            </if>
+            <if test="make_cost != null">
+                make_cost = #{make_cost,jdbcType=DECIMAL},
+            </if>
+            <if test="d1 != null">
+                d1 = #{d1,jdbcType=DATE},
+            </if>
+            <if test="d2 != null">
+                d2 = #{d2,jdbcType=DATE},
+            </if>
+            <if test="d3 != null">
+                d3 = #{d3,jdbcType=DATE},
+            </if>
+        </set>
+        where f_id = #{f_id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="editMainTZ" parameterType="com.jinfei.jfmm.model.mainTZ">
+        update b_main
+        <set>
+            <if test="f_id!=null">
+                f_id = #{f_id,jdbcType=VARCHAR},
+            </if>
+            <if test="f_name!=null">
+                f_name = #{f_name,jdbcType=VARCHAR},
+            </if>
+            <if test="match_no!=null">
+                match_no = #{match_no,jdbcType=VARCHAR},
+            </if>
+            <if test="model_id!=null">
+                model_id = #{model_id,jdbcType=VARCHAR},
+            </if>
+            <if test="unit!=null">
+                unit = #{unit,jdbcType=VARCHAR},
+            </if>
+            <if test="prop_mould_id!=null">
+                prop_mould_id = #{prop_mould_id,jdbcType=VARCHAR},
+            </if>
+            <if test="cast_type_id!=null">
+                cast_type_id = #{cast_type_id,jdbcType=VARCHAR},
+            </if>
+            <if test="make_fty_id!=null">
+                make_fty_id = #{make_fty_id,jdbcType=VARCHAR},
+            </if>
+            <if test="heat_fty_id!=null">
+                heat_fty_id = #{heat_fty_id,jdbcType=VARCHAR},
+            </if>
+            <if test="mould_mater_id!=null">
+                mould_mater_id = #{mould_mater_id,jdbcType=VARCHAR},
+            </if>
+            <if test="life_sum!=null">
+                life_sum = #{life_sum,jdbcType=VARCHAR},
+            </if>
+            <if test="usages!=null">
+                usages = #{usages,jdbcType=INTEGER},
+            </if>
+            <if test="usage_max!=null">
+                usage_max = #{usage_max,jdbcType=INTEGER},
+            </if>
+            <if test="make_cost!=null">
+                make_cost = #{make_cost,jdbcType=DECIMAL},
+            </if>
+            <if test="d1!=null and d1!=''">
+                d1 = #{d1,jdbcType=VARCHAR},
+            </if>
+            <if test="d2!=null and d2!=''">
+                d2 = #{d2,jdbcType=VARCHAR},
+            </if>
+            <if test="d3!=null and d3!=''">
+                d3 = #{d3,jdbcType=VARCHAR},
+            </if>
+            <if test="assets_state!=null">
+                assets_state = #{assets_state,jdbcType=VARCHAR},
+            </if>
+            <if test="location!=null">
+                location = #{location,jdbcType=VARCHAR},
+            </if>
+            <if test="trans_state!=null">
+                trans_state = #{trans_state,jdbcType=VARCHAR},
+            </if>
+            <if test="is_in_library!=null">
+                is_in_library = #{is_in_library,jdbcType=VARCHAR},
+            </if>
+            <if test="happen_time!=null and happen_time!=''">
+                happen_time = #{happen_time,jdbcType=DATE},
+            </if>
+            <if test="request_org!=null">
+                request_org = #{request_org,jdbcType=VARCHAR},
+            </if>
+            <if test="accep_into_factory_no!=null">
+                accep_into_factory_no = #{accep_into_factory_no,jdbcType=VARCHAR},
+            </if>
+            <if test="accep_no!=null">
+                accep_no = #{accep_no,jdbcType=VARCHAR},
+            </if>
+            <if test="transfer_order_no!=null">
+                transfer_order_no = #{transfer_order_no,jdbcType=VARCHAR},
+            </if>
+            <if test="accep_finish_time!=null and accep_finish_time!=''">
+                accep_finish_time = #{accep_finish_time,jdbcType=DATE},
+            </if>
+            <if test="trial_start_time!=null and trial_start_time!=''">
+                trial_start_time = #{trial_start_time,jdbcType=DATE},
+            </if>
+            <if test="trial_finish_time!=null and trial_finish_time!=''">
+                trial_finish_time = #{trial_finish_time,jdbcType=DATE},
+            </if>
+            <if test="last_upkeep_time!=null and last_upkeep_time!=''">
+                last_upkeep_time = #{last_upkeep_time,jdbcType=DATE},
+            </if>
+            <if test="scrap_time!=null and scrap_time!=''">
+                scrap_time = #{scrap_time,jdbcType=DATE},
+            </if>
+            <if test="reuse_time!=null and reuse_time!=''">
+                reuse_time = #{reuse_time,jdbcType=DATE},
+            </if>
+            <if test="edit_user!=null">
+                edit_user = #{edit_user,jdbcType=VARCHAR},
+            </if>
+            <if test="edit_time!=null">
+                edit_time = #{edit_time,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where f_id = #{f_id,jdbcType=VARCHAR}
+    </update>
+
+    <delete id="remove" parameterType="java.util.ArrayList">
+        delete from b_main where f_id in
+        <foreach item="item" collection="array" separator="," open="(" close=")" index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <select id="selectMatchNo" resultMap="ResultBaseTZ" parameterType="com.jinfei.jfmm.model.mainTZ">
+        select
+         match_no
+        from b_main a
+        LEFT JOIN b_model b on a.model_id = b.f_id
+        <where>
+            <if test="f_name != null and f_name != ''">
+                and a.f_name = #{f_name,jdbcType=VARCHAR}
+            </if>
+            <if test="prod_classify_id != null and prod_classify_id != ''">
+                and b.prod_classify_id = #{prod_classify_id}
+            </if>
+        </where>
+          GROUP BY match_no
+        <if test="offset!=null and pageSize!=null">
+            limit #{offset},#{pageSize}
+        </if>
+    </select>
+
+    <select id="prodCateList" resultMap="ResultBasePC">
+        SELECT
+	        b.prod_classify_id,
+	        a.f_name,
+	        b.classify_no,
+	        count(0) AS NUMS,
+	        a.assets_state,
+	        a.location,
+	        SUM(a.make_cost) AS cost
+        FROM
+	        b_main a
+	    LEFT JOIN b_model b ON a.model_id = b.f_id
+        GROUP BY
+            a.f_name,
+            a.assets_state,
+            a.location,
+            b.prod_classify_id
+        ORDER BY b.prod_classify_id
+    </select>
+
+    <select id="getMatchTotal" resultType="java.lang.Integer">
+        SELECT count(0) FROM  (select * FROM b_main
+        <where>
+            <if test="type == 1">
+                location = #{seat}
+            </if>
+        </where>
+        )	A
+        LEFT JOIN ( SELECT B.* FROM ( SELECT * FROM l_detl ORDER BY rece_time ) B GROUP BY B.part_id ) C ON A.f_id = C.part_id
+        LEFT JOIN l_main D ON D.f_id = c.main_id
+        LEFT JOIN k_seat E ON E.f_id = a.rack_position
+        LEFT JOIN k_shelf F ON E.shelf_id = F.f_id
+        LEFT JOIN k_area G ON F.area_id = G.f_id
+        <where>
+            <if test="type == 2">
+                G.f_id = #{seat}
+            </if>
+            <if test="type == 3">
+                F.f_id = #{seat}
+            </if>
+            <if test="type == 4">
+                A.rack_position = #{seat}
+            </if>
+        </where>
+    </select>
+
+    <select id="selectbMainList" resultMap="ResultBaseTZ">
+        SELECT A.*,D.out_org_id AS location_org_name , C.rece_time FROM  (select * FROM b_main
+        <where>
+            <if test="type == 1">
+                location = #{seat} limit #{pageNum},#{pageSize}
+            </if>
+        </where>
+         )	A
+        LEFT JOIN ( SELECT B.* FROM ( SELECT * FROM l_detl ORDER BY rece_time ) B GROUP BY B.part_id ) C ON A.f_id = C.part_id
+        LEFT JOIN l_main D ON D.f_id = c.main_id
+        LEFT JOIN k_seat E ON E.f_id = a.rack_position
+        LEFT JOIN k_shelf F ON E.shelf_id = F.f_id
+        LEFT JOIN k_area G ON F.area_id = G.f_id
+        <where>
+        <if test="type == 2">
+            G.f_id = #{seat} limit #{pageNum},#{pageSize}
+        </if>
+        <if test="type == 3">
+            F.f_id = #{seat} limit #{pageNum},#{pageSize}
+        </if>
+        <if test="type == 4">
+            A.rack_position = #{seat} limit #{pageNum},#{pageSize}
+        </if>
+        </where>
+    </select>
+
+    <select id="getMainTZ" resultMap="ResultBaseTZ">
+        select * FROM b_main where f_id = #{id}
+    </select>
+
+    <select id="getSeat" resultMap="ResultBaseTZ">
+	SELECT rack_position FROM b_main WHERE rack_position is not null AND rack_position != '' GROUP BY rack_position
+    </select>
+
+    <update id="updateRack">
+        update b_main set rack_position = #{seat} where f_id = #{bMainId}
+    </update>
+    <update id="setBF">
+        update b_main
+        set assets_state = 3,
+            location = #{location}
+        where f_id = #{part_id}
+    </update>
+</mapper>

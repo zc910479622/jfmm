@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<style>
+
+    .info{
+        background-color: #f5f5f5;
+    }
+
+</style>
+<body class="gray-bg">
+<div class="container-div ui-layout-center">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <input id="aOrg" value="" type="hidden">
+            <input id="area" value="" type="hidden">
+            <input id="shelf" value="" type="hidden">
+            <input id="seat" value="" type="hidden">
+            <input id="type" value="" type="hidden">
+            <input id="bMainId" value="" type="hidden">
+            <form id="user-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            仓库：<select type="text" name="ware" class="selectpicker" data-live-search="true" tabindex="-98" onchange="setAreaOption()"/>
+                            </select>
+                        </li>
+                        <li>
+                            库区：<select type="text" name="area" class="selectpicker" data-live-search="true" tabindex="-98" onchange="setShelfOption()"/>
+                            </select>
+                        </li>
+                        <li>
+                            货架：<select type="text" name="shelf" class="selectpicker" data-live-search="true" tabindex="-98" onchange="setSeatOption()"/>
+                            </select>
+                        </li>
+                        <li>
+                            货位：<select type="text" name="seat" class="selectpicker" data-live-search="true" tabindex="-98"/>
+                            </select>
+                        </li>
+
+                        <li>
+                            状态：<select type="text" name="stat" class="selectpicker" data-live-search="true" tabindex="-98"/>
+                            <option value="">请选择状态</option>
+                            <option value="1">有货</option>
+                            <option value="0">空</option>
+
+                            </select>
+                        </li>
+                        <li>
+                            <button class="btn btn-primary " type="button" onclick="$.table.search()"><i
+                                    class="fa fa-check"></i>&nbsp;搜索
+                            </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-danger " type="button" onclick="$.form.reset()"><i
+                                    class="fa fa-adjust"></i>&nbsp;重置
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-sm-6 select-table table-striped" style="margin-right: 1%; width: 44.5%" >
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+        <div class="col-sm-6 select-table table-striped" style="width: 54.5%">
+            <h3 id="title"></h3>
+            <table id="children-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var Dict = [[${@dict.getType('LZ_TYPE')}]];
+    var prefix = "/Basic/WareB";
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            sortName: "createTime",
+            sortOrder: "desc",
+            modalName: "库区",
+            search: false,
+            showExport: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            clickToSelect:true,
+            singleSelect:true,
+            /*onClickRow: function (row,$element) {
+                $('.info').removeClass('info');
+                $($element).addClass('info');
+                $("#aOrg").val(row.aOrgId);
+                $("#seat").val(row.seatId);
+                $("#title").html(row.aOrgName+" - "+row.areaName+" - "+row.shelfName+" - "+row.seatName);
+                $("#children-table").bootstrapTable('refresh', {
+                    silent: true
+                });
+            },*/
+            onLoadSuccess:function (data){
+                if (data.length>0) {
+                    $("#aOrg").val(data[0].aOrgId);
+                    $("#seat").val(data[0].seatId);
+                    // $("#title").html(data[0].aOrgName + " - " + data[0].areaName + " - " + data[0].shelfName + " - " + data[0].seatName);
+                    setChildrenTable();
+                }
+            },
+            columns: [
+                {
+                    field: 'aOrgName',
+                    title: '仓库',
+                    sortable: true,
+                    formatter:function (value,row,index) {
+                        var actions = [];
+                        actions.push('<a href="#" onclick="aaa(\'' + row.aOrgId + '\',\'' + row.areaId + '\',\'' + row.shelfId + '\',\'' + row.seatId + '\',1)">' + value + '</a> ');
+                        return actions.join('');
+                    }
+                },
+                {
+                    field: 'areaName',
+                    title: '库区',
+                    sortable: true,
+                    formatter:function (value,row,index) {
+                        var actions = [];
+                        actions.push('<a href="#" onclick="aaa(\'' + row.aOrgId + '\',\'' + row.areaId + '\',\'' + row.shelfId + '\',\'' + row.seatId + '\',2)">' + value + '</a> ');
+                        return actions.join('');
+                    }
+                },
+                {
+                    field: 'shelfName',
+                    title: '货架',
+                    sortable: true,
+                    formatter:function (value,row,index) {
+                        var actions = [];
+                        actions.push('<a href="#" onclick="aaa(\'' + row.aOrgId + '\',\'' + row.areaId + '\',\'' + row.shelfId + '\',\'' + row.seatId + '\',3)">' + value + '</a> ');
+                        return actions.join('');
+                    }
+                },
+                {
+                    field: 'seatName',
+                    title: '货位',
+                    sortable: true,
+                    formatter:function (value,row,index) {
+                        var actions = [];
+                        actions.push('<a href="#" onclick="aaa(\'' + row.aOrgId + '\',\'' + row.areaId + '\',\'' + row.shelfId + '\',\'' + row.seatId + '\',4)">' + value + '</a> ');
+                        return actions.join('');
+                    }
+                },
+                {
+                    field: 'stat',
+                    title: '货位状态',
+                    sortable: true,
+                    formatter:function (value,row,index) {
+                        if (value){
+                            return '有货';
+                        }else {
+                            return '空'
+                        }
+                    }
+                },
+                {
+                    title: '操作',
+                    formatter:function (value,row,index) {
+                        var actions = [];
+                            actions.push('<a class="btn btn-success btn-xs " href="#" onclick="storeBModel(\'' + row.aOrgId + '\',\''+row.seatId+'\')"><i class="fa fa-edit"></i>存放部件</a> ');
+                        return actions.join('');
+                    }
+                }
+                ]
+        };
+        $.table.init(options);
+    })
+
+    function setChildrenTable() {
+        $("#children-table").bootstrapTable({
+            url: prefix + "/bMainList",
+            sortName: "createTime",
+            sortOrder: "desc",
+            modalName: "",
+            search: false,
+            showExport: false,
+            pagination: true,
+            pageNumber: 1,
+            pageSize: 10,
+            pageList: [10, 25, 50],
+            sidePagination:'server',
+            queryParams:function (params) {
+                return {
+                    aOrg: $("#aOrg").val(),
+                    area: $("#area").val(),
+                    shelf: $("#shelf").val(),
+                    seat: $("#seat").val(),
+                    type:$("#type").val(),
+                    row: params.limit,
+                    page: params.offset
+                }
+            },
+            columns: [
+                {
+                    field: 'match_no',
+                    title: '部件匹配号',
+                    sortable: true
+                },
+                {
+                    field: 'f_name',
+                    title: '部件名称'
+                },
+                {
+                    field: 'userName',
+                    title: '部件顺序号'
+                },
+                {
+                    field: 'assets_state',
+                    title: '资产状态'
+                },
+                {
+                    field: 'rece_time',
+                    title: '入库日期'
+                },
+                {
+                    field: 'location',
+                    title: '入库部门'
+                },
+                {
+                    title: '操作',
+                    formatter:function (value,row,index) {
+                        $("#bMainId").val(row.f_id);
+                        var actions = [];
+                        var lable = null;
+                        $.each(Dict,function (i,obj) {
+                            if (obj.fValue == row.trans_state){
+                                lable = obj.fLable;
+                            }
+                        })
+                        if ($.common.isEmpty(lable)) {
+                            actions.push('<a class="btn btn-success btn-xs " href="#" onclick="selectWareTree(\'' + row.f_id + '\')"><i class="fa fa-edit"></i>库位变更</a> ');
+                        }else {
+                            actions.push('<a class="btn btn-warning btn-xs " href="#"><i class="fa fa-ban"></i>转运中</a> ');
+                        }
+                        return actions.join('');
+                    }
+                }]
+        })
+    }
+
+    function storeBModel(aOrgId,seatId) {
+        var options = {
+            title:'存放部件',
+            width: "1250",
+            url: "/Basic/WareB/storeBModel"+aOrgId+","+seatId,
+            callBack: doSubmitStore
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmitStore(index, layero){
+        var body = layer.getChildFrame('body', index);
+        var f_id = body.find("#f_id").val();
+        var seat = body.find("#seatId").val();
+        $.ajax({
+            url: "/Basic/Main/seatUpdate",
+            type: "POST",
+            dataType: "JSON",
+            data: {seat: seat, f_id: f_id},
+            beforeSend: function () {
+                $.modal.loading("正在处理中，请稍后...");
+            },
+            success: function (result) {
+                if (result.code == web_status.SUCCESS) {
+                    $("#bootstrap-table").bootstrapTable("refresh")
+                    $.modal.msgSuccess(result.msg);
+                    layer.close(index);
+                    $("#children-table").bootstrapTable("refresh")
+                } else {
+                    $.modal.alertError(result.msg);
+                }
+                $.modal.closeLoading();
+            }
+        })
+    }
+
+    function selectWareTree(fId) {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Ware/selectWareBTree/"+$('#aOrg').val()+","+fId,
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmit(index, layero){
+        var body = layer.getChildFrame('body', index);
+        if (body.find('#treeType').val()=="4") {
+
+            $.ajax({
+                url: prefix + "/update",
+                type: "POST",
+                dataType: "JSON",
+                data: {seat: body.find('#treeId').val(), bMainId: body.find('#bMainId').val()},
+                beforeSend: function () {
+                    $.modal.loading("正在处理中，请稍后...");
+                },
+                success: function (result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.modal.msgSuccess(result.msg);
+                        layer.close(index);
+                        $("#children-table").bootstrapTable("refresh")
+                    } else {
+                        $.modal.alertError(result.msg);
+                    }
+                    $.modal.closeLoading();
+                }
+            })
+
+        }else {
+            $.modal.msgError("请选择货位!")
+        }
+    }
+    $.post('/option/ware',function (data) {
+        var str = '<option value="">请选择仓库</option>';
+        $.each(data,function (i,obj) {
+            str+="<option value='"+obj.fId+"'>"+obj.fName+"</option>"
+        })
+        $("select[name='ware']").html(str);
+        $("select[name='ware']").selectpicker("refresh");
+    },'json')
+
+    function setAreaOption() {
+        $.post('/option/area', {"fPid":$("select[name='ware']").selectpicker('val')},function (data) {
+            var str = '<option value="">请选择库区</option>';
+            $.each(data,function (i,obj) {
+                str+="<option value='"+obj.fId+"'>"+obj.fName+"</option>"
+            })
+            $("select[name='area']").html(str);
+            $("select[name='area']").selectpicker("refresh");
+        },'json')
+        $("select[name='shelf']").html("");
+        $("select[name='seat']").html("");
+        $("select[name='shelf']").selectpicker("refresh");
+        $("select[name='seat']").selectpicker("refresh");
+    }
+    function setShelfOption() {
+        $.post('/option/shelf', {"fPid":$("select[name='area']").selectpicker('val')},function (data) {
+            var str = '<option value="">请选择货架</option>';
+            $.each(data,function (i,obj) {
+                str+="<option value='"+obj.fId+"'>"+obj.fName+"</option>"
+            })
+            $("select[name='shelf']").html(str);
+            $("select[name='shelf']").selectpicker("refresh");
+        },'json')
+        $("select[name='seat']").html("");
+        $("select[name='seat']").selectpicker("refresh");
+    }
+    function setSeatOption() {
+        $.post('/option/seat', {"fPid":$("select[name='shelf']").selectpicker('val'),state:"1"},function (data) {
+            var str = '<option value="">请选择货架</option>';
+            $.each(data,function (i,obj) {
+                str+="<option value='"+obj.fId+"'>"+obj.fName+"</option>"
+            })
+            $("select[name='seat']").html(str);
+            $("select[name='seat']").selectpicker("refresh");
+        },'json')
+    }
+
+    function aaa(org,area,shelf,seat,type) {
+        $("#aOrg").val(org);
+        $("#area").val(area);
+        $("#shelf").val(shelf);
+        $("#seat").val(seat);
+        $("#type").val(type);
+        $("#children-table").bootstrapTable('selectPage',1);
+        $("#children-table").bootstrapTable('refresh', {
+            silent: true,
+        });
+    }
+</script>
+</body>
+</html>

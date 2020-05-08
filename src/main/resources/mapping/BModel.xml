@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.IBModelDao" >
+    <resultMap id="ResultBase" type="com.jinfei.jfmm.model.BModel">
+        <result property="f_id" column="f_id" jdbcType="VARCHAR"/>
+        <result property="f_name" column="f_name" jdbcType="VARCHAR"/>
+        <result property="prod_classify_id" column="prod_classify_id" jdbcType="VARCHAR"/>
+        <result property="prod_spec_id" column="prod_spec_id" jdbcType="VARCHAR"/>
+        <result property="classify_no" column="classify_no" jdbcType="VARCHAR"/>
+        <result property="mould_spec_id" column="mould_spec_id" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="ResultBase" parameterType="com.jinfei.jfmm.model.BModel">
+        select * from b_model
+        <where>
+            <trim suffixOverrides="and" prefixOverrides="and">
+                <if test="f_id != null and f_id != ''">
+                    f_id = #{f_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="f_name != null and f_name != ''">
+                    f_name like concat("%",#{f_name,jdbcType=VARCHAR},"%")  and
+                </if>
+                <if test="prod_classify_id != null and prod_classify_id != ''">
+                    prod_classify_id = #{prod_classify_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="prod_spec_id != null and prod_spec_id != ''">
+                    prod_spec_id = #{prod_spec_id,jdbcType=VARCHAR} and
+            </if>
+                <if test="classify_no != null and classify_no != ''">
+                    classify_no = #{classify_no,jdbcType=VARCHAR} and
+                </if>
+                <if test="mould_spec_id != null and mould_spec_id != ''">
+                    mould_spec_id = #{mould_spec_id,jdbcType=VARCHAR}
+                </if>
+            </trim>
+        </where>
+        <!--<if test="orderByColumn!=null">
+            order by #{orderByColumn} #{isAsc}
+        </if>-->
+        <if test="offset!=null and pageSize!=null">
+            order by f_name asc
+            limit #{offset},#{pageSize}
+        </if>
+    </select>
+
+    <select id="getTotal" resultType="java.lang.Integer" parameterType="com.jinfei.jfmm.model.BModel">
+        select count(0) from b_model
+        <where>
+            <trim suffixOverrides="and" prefixOverrides="and">
+                <if test="f_id != null and f_id != ''">
+                    f_id = #{f_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="f_name != null and f_name != ''">
+                    f_name LIKE concat( "%",#{f_name,jdbcType=VARCHAR} ,"%")and
+                </if>
+                <if test="prod_classify_id != null and prod_classify_id != ''">
+                    prod_classify_id = #{prod_classify_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="prod_spec_id != null and prod_spec_id != ''">
+                    prod_spec_id = #{prod_spec_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="classify_no != null and classify_no != ''">
+                    classify_no = #{classify_no,jdbcType=VARCHAR} and
+                </if>
+                <if test="mould_spec_id != null and mould_spec_id != ''">
+                    mould_spec_id = #{mould_spec_id,jdbcType=VARCHAR}
+                </if>
+            </trim>
+        </where>
+    </select>
+    <select id="getBModel" resultType="com.jinfei.jfmm.model.BModel">
+        select * from b_model where f_id = #{modelId}
+    </select>
+
+    <insert id="add" parameterType="com.jinfei.jfmm.model.BModel">
+        insert into b_model
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="f_id != null">
+                f_id,
+            </if>
+            <if test="f_name != null">
+                f_name,
+            </if>
+            <if test="prod_classify_id != null">
+                prod_classify_id,
+            </if>
+            <if test="prod_spec_id != null">
+                prod_spec_id,
+            </if>
+            <if test="classify_no != null">
+                classify_no,
+            </if>
+            <if test="mould_spec_id != null">
+                mould_spec_id
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="f_id != null">
+                #{f_id,jdbcType=VARCHAR},
+            </if>
+            <if test="f_name != null">
+                #{f_name,jdbcType=VARCHAR},
+            </if>
+            <if test="prod_classify_id != null">
+                #{prod_classify_id,jdbcType=VARCHAR},
+            </if>
+            <if test="prod_spec_id != null">
+                #{prod_spec_id,jdbcType=VARCHAR},
+            </if>
+            <if test="classify_no != null">
+                 #{classify_no,jdbcType=VARCHAR},
+            </if>
+            <if test="mould_spec_id != null">
+                #{mould_spec_id,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <insert id="addByMMain" parameterType="java.util.ArrayList">
+        insert into b_model(f_id,f_name,prod_classify_id,prod_spec_id,classify_no,mould_spec_id) values
+        <foreach item="item" collection="list" separator="," index="">
+            <trim prefix=" (" suffix=")" suffixOverrides=",">
+                #{item.f_id,jdbcType=VARCHAR},
+                #{item.f_name,jdbcType=VARCHAR},
+                #{item.prod_classify_id,jdbcType=VARCHAR},
+                #{item.prod_spec_id,jdbcType=VARCHAR},
+                #{item.classify_no,jdbcType=VARCHAR},
+                #{item.mould_spec_id,jdbcType=VARCHAR},
+            </trim>
+        </foreach>
+    </insert>
+
+    <update id="edit" parameterType="com.jinfei.jfmm.model.BModel">
+        update b_model
+        <set>
+            <if test="f_name != null">
+                f_name = #{f_name,jdbcType=VARCHAR},
+            </if>
+            <if test="prod_classify_id != null">
+                prod_classify_id = #{prod_classify_id,jdbcType=VARCHAR},
+            </if>
+            <if test="prod_spec_id != null">
+                prod_spec_id = #{prod_spec_id,jdbcType=VARCHAR},
+            </if>
+            <if test="classify_no != null">
+                classify_no = #{classify_no,jdbcType=VARCHAR},
+            </if>
+            <if test="mould_spec_id != null">
+                mould_spec_id = #{mould_spec_id,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where f_id = #{f_id,jdbcType=VARCHAR}
+    </update>
+    <delete id="remove" parameterType="java.util.ArrayList">
+        delete from b_model where f_id in
+        <foreach item="item" collection="array" separator="," open="(" close=")" index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+</mapper>

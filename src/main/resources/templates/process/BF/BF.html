@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="dept-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            报废单号：
+                            <input type="text" name="bill_no">
+                        </li>
+                        <li>
+                            部件编号：
+                            <input type="text" name="part_no">
+                        </li>
+                        <li class="select-time">
+                            <label>发起时间：</label>
+                            <input type="text" class="time-input col-sm-4" id="startTime" placeholder="开始时间"
+                                   name="startTime"/>
+                            <span>-</span>
+                            <input type="text" class="time-input col-sm-4" id="endTime" placeholder="结束时间"
+                                   name="endTime"/>
+                        </li>
+                        <li>
+                            转出部门：
+                            <input type="text" id="out_org_name" value="" onclick="selectDeptTreeOut()"
+                                   placeholder="转出部门" readonly>
+                            <input type="hidden" class="reset-input" name="out_org_id" id="out_org_id">
+                        </li>
+
+                        <li>
+                            转入部门：
+                            <input type="text" id="in_org_name" value="" onclick="selectDeptTreeIn()" placeholder="转入部门"
+                                   readonly>
+                            <input type="hidden" class="reset-input" name="in_org_id" id="in_org_id">
+                        </li>
+                        <li>
+                            <button class="btn btn-primary " type="button" onclick="$.table.search()"><i
+                                    class="fa fa-check"></i>&nbsp;搜索
+                            </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-danger " type="button" onclick="$.form.reset()"><i
+                                    class="fa fa-adjust"></i>&nbsp;重置
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <!-- Panel Other -->
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a type="button" class="btn btn-outline btn-default" id="addData"
+               onclick="$.operate.add(null,1200)"><i
+                    class="glyphicon glyphicon-plus" aria-hidden="true"></i></a>
+            <a type="button" class="btn btn-outline btn-default btn-del disabled" id="deleteData"
+               onclick="$.operate.removeAll()">
+                <i class="glyphicon glyphicon-trash" aria-hidden="true"></i>
+            </a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+</body>
+<script th:inline="javascript">
+    var LZ_TYPE = [[${@dict.getType('LZ_TYPE')}]];
+    var user = [[${@user.getUserList()}]];
+    var staff = [[${@staff.getStaffList()}]];
+    var prefix = "/process/BF";
+
+    $(function () {
+        var options = {
+            uniqueId: "f_id",
+            url: prefix + "/selectAll",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/removeIMain",
+            exportUrl: prefix + "/export",
+            receiveUrl: prefix + "/table",
+            sortName: "init_time",
+            sortOrder: "desc",
+            pagination: true,                   //是否显示分页（*）
+            modalName: "模具报废",
+            search: false,
+            showExport: false,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'bill_no',
+                    title: '报废单号',
+                    formatter:function(value, row, index){
+                        return '<a onclick="$.operate.edit(\'' + row.f_id + '\',1200,true)">'+value+'</a>';
+                    }
+                },
+                {
+                    field: 'init_man_id',
+                    title: '发起人',
+                    align: "center",
+                    formatter: function (value, row, index) {
+                        for (var i=0;i<user.length;i++){
+                            if (user[i].userId == value ) {
+                                return user[i].userName;
+                            }
+                        }
+                    }
+                },
+                {
+                    field: 'init_time',
+                    title: '发起时间',
+                    align: "center",
+                },
+                {
+                    field: 'out_org_name',
+                    title: '转出部门',
+                    align: "center"
+                },
+                {
+                    field: 'out_man_id',
+                    title: '转出人',
+                    align: "center",
+                    formatter: function (value, row, index) {
+                        for (var i=0;i<staff.length;i++){
+                            if (staff[i].f_id == value ) {
+                                return staff[i].f_name;
+                            }
+                        }
+                    }
+                },
+                {
+                    field: 'out_time',
+                    title: '实际转出时间',
+                    align:"center"
+                },
+                {
+                    field: 'in_man_id',
+                    title: '转入人',
+                    align: "center",
+                    formatter: function (value, row, index) {
+                        for (var i=0;i<staff.length;i++){
+                            if (staff[i].f_id == value ) {
+                                return staff[i].f_name;
+                            }
+                        }
+                    }
+                },
+                {
+                    field: 'in_time',
+                    title: '实际转入时间',
+                    align:"center"
+                },
+                {
+                    field: 'idetl_count',
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        if (value==0){
+                            actions.push('<a class="btn btn-success btn-xs " onclick="img(\'' + row.f_id + '\')"><i class="fa fa-edit"></i>查看评审单</a> ');
+                        } else {
+                            actions.push('<a class="btn btn-success btn-xs " onclick="winprint(\'' + row.f_id + '\')"><i class="fa fa-edit"></i>打印评审单</a> ');
+                            actions.push('<a class="btn btn-success btn-xs " onclick="Receive(\'' + row.f_id + '\')"><i class="fa fa-edit"></i>上传评审单</a> ');
+                        }
+                        return actions.join('');
+                        // actions.push('<a class="btn btn-danger btn-xs " onclick="$.operate.remove(\'' + row.f_id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                    }
+                }
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function call(index) {
+        $.modal.closeAll();
+        $.table.refresh();
+    }
+
+    function img(id) {
+        $.modal.open("查看评审单", prefix+"/img/"+id,1200);
+    }
+
+    function winprint(id) {
+        $.modal.open("打印评审单", prefix+"/table/"+id,1200);
+    }
+    function Receive(f_id) {
+        $.modal.open('上传评审单',prefix + "/ReceiveTo?fId=" + f_id,"800",null,ReceiveCallBack);
+    }
+
+    function ReceiveCallBack(index, layero) {
+        var iframeWin = layero.find('iframe')[0];
+        $.ajax({
+            async:false
+        })
+        iframeWin.contentWindow.submitHandler(index);
+    }
+
+    function formatterDate(time) {
+        var date = time==null?new Date():new Date(time);
+        var str = date.getFullYear() + "-" + jl(date.getMonth() + 1) + "-" + jl(date.getDate()) + " " + jl(date.getHours()) + ":" + jl(date.getMinutes()) + ":" + jl(date.getSeconds());
+        return str;
+    }
+
+    function getText(string, value) {
+        var str = string.replace(/></g, ",").split(",");
+        for (var i = 0; i < str.length; i++) {
+            var ret = str[i];
+            var val = ret.substring(ret.indexOf('\'') + 1, ret.indexOf('\'', ret.indexOf('\'') + 1));
+            if (val == value) {
+                return ret.substring(ret.indexOf('>') + 1, ret.indexOf('<', ret.indexOf('>')))
+            }
+        }
+    }
+
+    function jl(value) {
+        if (value.toString().length <= 1) {
+            return "0" + value;
+        } else {
+            return value;
+        }
+    }
+
+    function selectDeptTreeOut() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Dept/selectDeptTree/" + ($("#out_org_id").val() ? $("#out_org_id").val() : "0"),
+            callBack: doSubmitOut
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmitOut(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        $("#out_org_id").val(body.find('#treeId').val());
+        $("#out_org_name").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+
+    function selectDeptTreeIn() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Dept/selectDeptTree/" + ($("#in_org_id").val() ? $("#in_org_id").val() : "0"),
+            callBack: doSubmitIn
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmitIn(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        $("#in_org_id").val(body.find('#treeId').val());
+        $("#in_org_name").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+</script>
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_bootstrap.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:06 GMT -->
+</html>

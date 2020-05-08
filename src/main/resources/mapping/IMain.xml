@@ -1,0 +1,292 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.IIMainDao">
+    <resultMap id="ResultBase" type="com.jinfei.jfmm.model.IMain">
+        <result property="f_id" column="f_id" jdbcType="VARCHAR"/>
+        <result property="f_type" column="f_type" jdbcType="VARCHAR"/>
+        <result property="bill_no" column="bill_no" jdbcType="VARCHAR"/>
+        <result property="init_man_id" column="init_man_id" jdbcType="VARCHAR"/>
+        <result property="init_time" column="init_time" jdbcType="TIMESTAMP"/>
+        <result property="plan_out_time" column="plan_out_time" jdbcType="TIMESTAMP"/>
+        <result property="plan_in_time" column="plan_in_time" jdbcType="TIMESTAMP"/>
+        <result property="out_org_id" column="out_org_id" jdbcType="VARCHAR"/>
+        <result property="out_org_name" column="out_org_name" jdbcType="VARCHAR"/>
+        <result property="out_man_id" column="out_man_id" jdbcType="VARCHAR"/>
+        <result property="out_time" column="out_time" jdbcType="TIMESTAMP"/>
+        <result property="in_org_id" column="in_org_id" jdbcType="VARCHAR"/>
+        <result property="in_org_name" column="in_org_name" jdbcType="VARCHAR"/>
+        <result property="in_man_id" column="in_man_id" jdbcType="VARCHAR"/>
+        <result property="in_time" column="in_time" jdbcType="TIMESTAMP"/>
+        <result property="idetl_count" column="idetl_count" jdbcType="INTEGER"/>
+        <result property="trans_man" column="trans_man" jdbcType="VARCHAR"/>
+        <result property="trans_man_phone" column="trans_man_phone" jdbcType="VARCHAR"/>
+        <result property="car_plate" column="car_plate" jdbcType="VARCHAR"/>
+        <result property="part_no" column="part_no" jdbcType="VARCHAR"/>
+        <result property="execution_id" column="execution_id" jdbcType="VARCHAR"/>
+        <result property="task_id" column="task_id" jdbcType="VARCHAR"/>
+        <result property="is_process" column="is_process" jdbcType="INTEGER"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="ResultBase" parameterType="com.jinfei.jfmm.model.IMain">
+        select f_id,f_type,bill_no,init_man_id,init_time,plan_out_time,plan_in_time,out_org_id,out_org_name,out_man_id,
+        out_time,in_org_id,in_org_name,in_man_id,in_time,idetl_count,trans_man,trans_man_phone,car_plate from
+        (select
+        l_main.f_id,
+        l_main.f_type,
+        l_main.bill_no,
+        l_main.init_man_id,
+        l_main.init_time as init_time,
+        l_main.is_process,
+        date(l_main.plan_out_time) as plan_out_time,
+        date(l_main.plan_in_time) as plan_in_time,
+        l_main.out_org_id,
+        (select f_name from a_org where a_org.f_id = l_main.out_org_id) as out_org_name,
+        l_main.out_man_id,
+        date(l_main.out_time) as out_time,
+        l_main.in_org_id,
+        (select f_name from a_org where a_org.f_id = l_main.in_org_id) as in_org_name,
+        l_main.in_man_id,
+        date(l_main.in_time) as in_time,
+        (select count(0) from l_detl where l_detl.main_id = l_main.f_id and rece_time is not true ) as idetl_count,
+        l_main.trans_man,
+        l_main.trans_man_phone,
+        l_main.car_plate,
+        (SELECT match_no FROM b_main WHERE b_main.f_id = l_detl.part_id) as part_no
+        from l_main left join l_detl on l_main.f_id = l_detl.main_id) a
+        <where>
+            <trim suffixOverrides="and" prefixOverrides="and">
+                <if test="f_id != null and f_id != ''">
+                    f_id = #{f_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="f_type != null and f_type != ''">
+                    f_type = #{f_type,jdbcType=VARCHAR} and
+                </if>
+                <if test="bill_no != null and bill_no != ''">
+                    bill_no like concat("%",#{bill_no,jdbcType=VARCHAR},"%") and
+                </if>
+                <if test="init_man_id != null and init_man_id != ''">
+                    init_man_id = #{init_man_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="startTime != null and startTime != ''">
+                    init_time > #{startTime,jdbcType=TIMESTAMP} and
+                </if>
+                <if test="endTime != null and endTime != ''">
+                    <![CDATA[init_time <= #{endTime,jdbcType=TIMESTAMP} and]]>
+                </if>
+                <if test="plan_out_time != null and plan_out_time != ''">
+                    plan_out_time = #{plan_out_time,jdbcType=TIMESTAMP} and
+                </if>
+                <if test="plan_in_time != null and plan_in_time != ''">
+                    plan_in_time = #{plan_in_time,jdbcType=TIMESTAMP} and
+                </if>
+                <if test="out_org_id != null and out_org_id != ''">
+                    out_org_id = #{out_org_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="out_man_id != null and out_man_id != ''">
+                    out_man_id = #{out_man_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="out_time != null and out_time != ''">
+                    out_time = #{out_time,jdbcType=TIMESTAMP} and
+                </if>
+                <if test="in_org_id != null and in_org_id != ''">
+                    in_org_id = #{in_org_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="in_man_id != null and in_man_id != ''">
+                    in_man_id = #{in_man_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="in_time != null and in_time != ''">
+                    in_time = #{in_time,jdbcType=TIMESTAMP} and
+                </if>
+                <if test="trans_man != null and trans_man != ''">
+                    trans_man = #{trans_man,jdbcType=VARCHAR} and
+                </if>
+                <if test="trans_man_phone != null and trans_man_phone != ''">
+                    trans_man_phone = #{trans_man_phone,jdbcType=VARCHAR} and
+                </if>
+                <if test="car_plate != null and car_plate != ''">
+                    car_plate = #{car_plate,jdbcType=VARCHAR} and
+                </if>
+                <if test="part_no != null">
+                    part_no like concat("%",#{part_no,jdbcType=VARCHAR},"%") and
+                </if>
+                <choose>
+                    <when test="is_process != null">
+                        is_process = 1 and
+                    </when>
+                    <otherwise>
+                        is_process = 0 and
+                    </otherwise>
+                </choose>
+            </trim>
+        </where>
+        group by
+        f_id,f_type,bill_no,init_man_id,init_time,plan_out_time,plan_in_time,out_org_id,out_org_name,out_man_id,
+        out_time,in_org_id,in_org_name,in_man_id,in_time,idetl_count,trans_man,trans_man_phone,car_plate
+        <if test="orderByColumn!=null">
+            order by #{orderByColumn} #{isAsc}
+        </if>
+
+    </select>
+    <select id="selectPath" resultType="java.lang.String">
+        SELECT
+            l_deti_file.file_src
+        FROM
+            l_main
+            LEFT JOIN l_detl ON l_main.f_id = l_detl.main_id
+            LEFT JOIN l_deti_file ON l_detl.f_id = l_deti_file.detl_id
+        WHERE
+            l_main.f_id = #{id}
+        GROUP BY l_deti_file.file_src
+    </select>
+
+    <insert id="add" parameterType="com.jinfei.jfmm.model.IMain">
+        insert into l_main
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="f_id != null and f_id != ''">
+                f_id,
+            </if>
+            <if test="f_type != null">
+                f_type,
+            </if>
+            <if test="bill_no != null and bill_no != ''">
+                bill_no,
+            </if>
+            <if test="init_man_id != null and init_man_id != ''">
+                init_man_id,
+            </if>
+            <if test="init_time != null and init_time != ''">
+                init_time,
+            </if>
+            <if test="plan_out_time != null and plan_out_time != ''">
+                plan_out_time,
+            </if>
+            <if test="plan_in_time != null and plan_in_time != ''">
+                plan_in_time,
+            </if>
+            <if test="out_org_id != null and out_org_id != ''">
+                out_org_id,
+            </if>
+            <if test="out_man_id != null and out_man_id != ''">
+                out_man_id,
+            </if>
+            <if test="out_time != null and out_time != ''">
+                out_time,
+            </if>
+            <if test="in_org_id != null and in_org_id != ''">
+                in_org_id,
+            </if>
+            <if test="in_man_id != null and in_man_id != ''">
+                in_man_id,
+            </if>
+            <if test="in_time != null and in_time != ''">
+                in_time,
+            </if>
+            <if test="trans_man != null and trans_man != ''">
+                trans_man,
+            </if>
+            <if test="trans_man_phone != null and trans_man_phone != ''">
+                trans_man_phone,
+            </if>
+            <if test="car_plate != null and car_plate != ''">
+                car_plate,
+            </if>
+            <if test="is_process != null">
+                is_process
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="f_id != null and f_id != ''">
+                #{f_id,jdbcType=VARCHAR},
+            </if>
+            <if test="f_type != null">
+                #{f_type,jdbcType=VARCHAR},
+            </if>
+            <if test="bill_no != null and bill_no != ''">
+                #{bill_no,jdbcType=VARCHAR},
+            </if>
+            <if test="init_man_id != null and init_man_id != ''">
+                #{init_man_id,jdbcType=VARCHAR},
+            </if>
+            <if test="init_time != null and init_time != ''">
+                #{init_time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="plan_out_time != null and plan_out_time != ''">
+                #{plan_out_time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="plan_in_time != null and plan_in_time != ''">
+                #{plan_in_time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="out_org_id != null and out_org_id != ''">
+                #{out_org_id,jdbcType=VARCHAR},
+            </if>
+            <if test="out_man_id != null and out_man_id != ''">
+                #{out_man_id,jdbcType=VARCHAR},
+            </if>
+            <if test="out_time != null and out_time != ''">
+                #{out_time,jdbcType=TIMESTAMP},
+            </if>
+            <if test="in_org_id != null and in_org_id != ''">
+                #{in_org_id,jdbcType=VARCHAR},
+            </if>
+            <if test="in_man_id != null and in_man_id != ''">
+                #{in_man_id,jdbcType=VARCHAR},
+            </if>
+            <if test="in_time != null and in_time != ''">
+                #{in_time,jdbcType=TIMESTAMP}
+            </if>
+            <if test="trans_man != null and trans_man != ''">
+                #{trans_man,jdbcType=VARCHAR},
+            </if>
+            <if test="trans_man_phone != null and trans_man_phone != ''">
+                #{trans_man_phone,jdbcType=VARCHAR},
+            </if>
+            <if test="car_plate != null and car_plate != ''">
+                #{car_plate,jdbcType=VARCHAR},
+            </if>
+            <if test="is_process != null">
+                #{is_process,jdbcType=INTEGER}
+            </if>
+        </trim>
+        ON DUPLICATE KEY UPDATE f_type = values(f_type),
+        bill_no = values(bill_no),
+        init_man_id = values(init_man_id),
+        init_time = values(init_time),
+        plan_out_time = values(plan_out_time),
+        plan_in_time = values(plan_in_time),
+        out_org_id = values(out_org_id),
+        out_man_id = values(out_man_id),
+        out_time = values(out_time),
+        in_org_id = values(in_org_id),
+        in_man_id = values(in_man_id),
+        in_time = values(in_time),
+        trans_man = values(trans_man),
+        trans_man_phone = values(trans_man_phone),
+        car_plate = values(car_plate),
+        is_process = VALUES(is_process)
+    </insert>
+
+    <update id="Receive" parameterType="com.jinfei.jfmm.model.IMain">
+        update l_main
+        <set>
+            <trim suffixOverrides=",">
+                <if test="in_man_id!=null">
+                    in_man_id = #{in_man_id,jdbcType=VARCHAR},
+                </if>
+                <if test="in_time!=null">
+                    in_time = #{in_time,jdbcType=VARCHAR},
+                </if>
+                <if test="is_process!=null">
+                    is_process = #{is_process,jdbcType=INTEGER}
+                </if>
+            </trim>
+        </set>
+        where f_id = #{f_id,jdbcType=VARCHAR}
+    </update>
+
+    <delete id="remove" parameterType="java.util.ArrayList">
+        delete from l_main where f_id in
+        <foreach item="item" collection="array" separator="," open="(" close=")" index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+</mapper>

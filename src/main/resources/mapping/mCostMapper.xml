@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinfei.jfmm.dao.mCostMapper">
+    <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.mCost">
+        <id column="f_id" jdbcType="VARCHAR" property="fId"/>
+        <result column="w_cost" jdbcType="INTEGER" property="wCost"/>
+        <result column="sm_prop" jdbcType="INTEGER" property="smProp"/>
+        <result column="xm_prop" jdbcType="INTEGER" property="xmProp"/>
+        <result column="bm_prop" jdbcType="INTEGER" property="bmProp"/>
+        <result column="mj_prop" jdbcType="INTEGER" property="mjProp"/>
+        <result column="prod_cate" jdbcType="VARCHAR" property="prodCate"/>
+        <result column="cast_type" jdbcType="VARCHAR" property="castType"/>
+        <result column="f_lable" jdbcType="VARCHAR" property="fLable"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    f_id, w_cost, sm_prop, xm_prop, bm_prop, mj_prop, prod_cate,cast_type
+  </sql>
+    <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from m_cost
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </select>
+    <select id="list" resultMap="BaseResultMap">
+      SELECT
+      m_cost.*,a_dict.f_lable
+      FROM
+      m_cost
+      LEFT JOIN a_dict ON m_cost.f_id = a_dict.f_id
+    </select>
+    <select id="check" resultType="java.lang.Boolean">
+        SELECT
+         count(0)
+         from m_cost
+         where f_id = #{fId,jdbcType=VARCHAR} AND prod_cate = #{prodCate,jdbcType=VARCHAR} AND cast_type = #{castType,jdbcType=VARCHAR}
+    </select>
+    <select id="getCost" resultMap="BaseResultMap">
+        SELECT
+         *
+         from m_cost
+         where f_id = #{fId,jdbcType=VARCHAR} AND prod_cate = #{prodCate,jdbcType=VARCHAR} AND cast_type = #{castType,jdbcType=VARCHAR}
+    </select>
+    <select id="getCostOf" resultMap="BaseResultMap">
+	SELECT
+	    m_cost.*
+    FROM
+	    m_cost
+	LEFT JOIN a_dict ON a_dict.f_id = m_cost.f_id
+	LEFT JOIN b_model ON b_model.prod_spec_id = a_dict.f_value AND b_model.prod_classify_id = m_cost.prod_cate
+	WHERE
+	b_model.f_id = #{modelId} AND m_cost.cast_type = #{cast_type_id}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from m_cost
+    where f_id = #{fId,jdbcType=VARCHAR} AND prod_cate = #{prodCate,jdbcType=VARCHAR} AND cast_type = #{castType,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insert" parameterType="com.jinfei.jfmm.model.mCost">
+    insert into m_cost (f_id, w_cost, sm_prop, 
+      xm_prop, bm_prop, mj_prop, 
+      prod_cate,cast_type)
+    values (#{fId,jdbcType=VARCHAR}, #{wCost,jdbcType=INTEGER}, #{smProp,jdbcType=INTEGER}, 
+      #{xmProp,jdbcType=INTEGER}, #{bmProp,jdbcType=INTEGER}, #{mjProp,jdbcType=INTEGER}, 
+      #{prodCate,jdbcType=VARCHAR},#{castType,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.jinfei.jfmm.model.mCost">
+        insert into m_cost
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                f_id,
+            </if>
+            <if test="wCost != null">
+                w_cost,
+            </if>
+            <if test="smProp != null">
+                sm_prop,
+            </if>
+            <if test="xmProp != null">
+                xm_prop,
+            </if>
+            <if test="bmProp != null">
+                bm_prop,
+            </if>
+            <if test="mjProp != null">
+                mj_prop,
+            </if>
+            <if test="prodCate != null">
+                prod_cate,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                #{fId,jdbcType=VARCHAR},
+            </if>
+            <if test="wCost != null">
+                #{wCost,jdbcType=INTEGER},
+            </if>
+            <if test="smProp != null">
+                #{smProp,jdbcType=INTEGER},
+            </if>
+            <if test="xmProp != null">
+                #{xmProp,jdbcType=INTEGER},
+            </if>
+            <if test="bmProp != null">
+                #{bmProp,jdbcType=INTEGER},
+            </if>
+            <if test="mjProp != null">
+                #{mjProp,jdbcType=INTEGER},
+            </if>
+            <if test="prodCate != null">
+                #{prodCate,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jinfei.jfmm.model.mCost">
+        update m_cost
+        <set>
+            <if test="wCost != null">
+                w_cost = #{wCost,jdbcType=INTEGER},
+            </if>
+            <if test="smProp != null">
+                sm_prop = #{smProp,jdbcType=INTEGER},
+            </if>
+            <if test="xmProp != null">
+                xm_prop = #{xmProp,jdbcType=INTEGER},
+            </if>
+            <if test="bmProp != null">
+                bm_prop = #{bmProp,jdbcType=INTEGER},
+            </if>
+            <if test="mjProp != null">
+                mj_prop = #{mjProp,jdbcType=INTEGER},
+            </if>
+            <if test="castType != null">
+                cast_type = #{castType,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where f_id = #{fId,jdbcType=VARCHAR} AND
+        prod_cate = #{prodCate,jdbcType=VARCHAR} AND cast_type = #{castType,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.jinfei.jfmm.model.mCost">
+    update m_cost
+    set w_cost = #{wCost,jdbcType=INTEGER},
+      sm_prop = #{smProp,jdbcType=INTEGER},
+      xm_prop = #{xmProp,jdbcType=INTEGER},
+      bm_prop = #{bmProp,jdbcType=INTEGER},
+      mj_prop = #{mjProp,jdbcType=INTEGER}
+    where f_id = #{fId,jdbcType=VARCHAR}
+      prod_cate = #{prodCate,jdbcType=VARCHAR}
+  </update>
+</mapper>

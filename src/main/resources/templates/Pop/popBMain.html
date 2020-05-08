@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<style>
+    .card-view {
+        width: 25%;
+        float: left;
+    }
+
+    .fixed-table-body .card-view .title {
+        font-weight: bold;
+    }
+
+    .card-view .title {
+        min-width: 30%;
+    }
+</style>
+
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <input id="fId" type="hidden">
+        <input id="matchNo" type="hidden">
+        <div class="col-sm-12 search-collapse">
+            <form id="dept-form">
+                <div class="select-list">
+                    <input name="f_name" value="${type}" type="hidden">
+                    <ul>
+                        <li>
+                            部件型号：
+                            <select id="model_id" name="model_id" class="selectpicker" style="width: 100%"
+                                    data-live-search="true" tabindex="-98" th:with="bModels=${@bModel.list()}">
+                                <option value="">请选择类型</option>
+                                <option th:each="bModel : ${bModels}" th:text="${bModel.f_name}" th:value="${bModel.f_id}"></option>
+
+                            </select>
+                        </li>
+                        <li>
+                            铸造类型:
+                            <select id="cast_type_id" name="cast_type_id" class="selectpicker" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('cast_type')}">
+                                <option value="">请选择类型</option>
+                                <option th:each="dict : ${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <button class="btn btn-primary " type="button" onclick="$.table.search()"><i
+                                    class="fa fa-check"></i>&nbsp;搜索
+                            </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-danger " type="button" onclick="$.form.reset()"><i
+                                    class="fa fa-adjust"></i>&nbsp;重置
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <!-- Panel Other -->
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+</body>
+<script th:inline="javascript">
+    var cast_type = [[${@dict.getType('cast_type')}]];
+    var mould_spec = [[${@dict.getType('mould_spec')}]];
+    var prod_spec = [[${@dict.getType('prod_spec')}]];
+    var mould_mater = [[${@dict.getType('mould_mater')}]];
+    var asset_states = [[${@dict.getType('asset_states')}]];
+    var mould_state = [[${@dict.getType('mould_state')}]];
+    var bModel = [[${@bModel.list()}]];
+    var prefix = "/Basic/Main";
+    var fIdArr = [];
+    var matchNoArr = [];
+    $(function () {
+        var options = {
+            uniqueId: "f_id",
+            url: prefix + "/selectPopAll",
+            sortName: "f_name",
+            sortOrder: "asc",
+            pagination: true,                   //是否显示分页（*）
+            modalName: "部件",
+            search: false,
+            clickToSelect: true,
+            showExport: false,
+            showToggle: false,
+            striped: false,
+            showRefresh: false,
+            showColumns: false,
+            queryParams: function (params) {
+                return {
+                    "f_name": '${type}',
+                    pageSize: params.limit,
+                    pageNum: params.offset / params.limit + 1,
+                    searchValue: params.search,
+                    orderByColumn: params.sort,
+                    isAsc: params.order
+                }
+            },
+            onClickRow: function (row, $element) {
+                if ($element.hasClass('selected')) {
+                    console.log(fIdArr.indexOf(row.f_id))
+                    fIdArr.splice(fIdArr.indexOf(row.f_id), 1)
+                    matchNoArr.splice(fIdArr.indexOf(row.f_id), 1)
+                } else {
+                    fIdArr.push(row.f_id);
+                    matchNoArr.push(row.match_no);
+                }
+                $("#fId").val(fIdArr.join(","));
+                $("#matchNo").val(matchNoArr.join(","));
+            },
+            columns: [
+                {
+                    field: "selectItem",
+                    checkbox: true,
+                    formatter: function () {
+                        return {checked: true}
+                    }
+                },
+                {
+                    field: 'match_no',
+                    title: '匹配号',
+                    // halign:"center"
+                },
+                {
+                    field: 'model_id',
+                    title: '部件型号',
+                    // halign:"center"
+                    formatter: function (value, row, index) {
+                        return getText(bModel, value);
+                    }
+                },
+                {
+                    field: 'cast_type_id',
+                    title: '模具类型',
+                    align: "center",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(cast_type, value);
+                    }
+                },
+                {
+                    field: 'spec_id',
+                    title: '模具规格',
+                    align: "center",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(mould_spec, value);
+                    }
+                },
+                {
+                    field: 'f_no',
+                    title: '专属模具编号',
+                    // halign:"center"
+                    align: 'center',
+                },
+                {
+                    field: 'mmd_name',
+                    title: '专属模具型号',
+                    // halign:"center",
+                    align: "right",
+                },
+                {
+                    field: 'prod_spec_id',
+                    title: '产品尺寸',
+                    // halign:"center",
+                    align: "right",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(prod_spec,value);
+                    }
+                },
+                {
+                    field: 'mould_mater_id',
+                    title: '模具材料',
+                    // halign:"center",
+                    align: "center",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(mould_mater,value);
+                    }
+                },
+                {
+                    field: 'assets_state',
+                    title: '资产状态',
+                    // halign:"center",
+                    align: "center",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(asset_states,value);
+                    }
+                },
+                {
+                    field: 'mould_state',
+                    title: '模具状态',
+                    // halign:"center",
+                    align: "center",
+                    formatter: function (value, row, index) {
+                        return $.table.selectDictLabel(mould_state,value);
+                    }
+                },
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function getText(obj,value) {
+        var fName = "";
+        $.each(obj,function (i,v) {
+            if (v.f_id==value){
+                fName = v.f_name;
+            }
+        });
+        return fName
+    }
+</script>
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_bootstrap.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:06 GMT -->
+</html>

@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.mMatchMapper">
+    <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.mMatch">
+        <id column="f_id" property="fId" jdbcType="VARCHAR"/>
+        <result column="m_main_id" property="mMainId" jdbcType="VARCHAR"/>
+        <result column="b_match_no" property="bMatchNo" jdbcType="VARCHAR"/>
+        <result column="edit_user" property="editUser" jdbcType="VARCHAR"/>
+        <result column="edit_time" property="editTime" jdbcType="TIMESTAMP"/>
+        <result column="mMainName" property="mMainName" jdbcType="VARCHAR"/>
+        <result column="partsCate" property="partsCate" jdbcType="VARCHAR"/>
+        <result column="mModelName" property="mModelName" jdbcType="VARCHAR"/>
+        <result column="compParts" property="compParts" jdbcType="VARCHAR"/>
+        <result column="matchNo" property="matchNo" jdbcType="VARCHAR"/>
+        <result column="prod_cate" property="prodCate" jdbcType="VARCHAR"/>
+        <result column="cast_type" property="castType" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    f_id, m_main_id, b_match_no, edit_user, edit_time
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from m_match
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from m_match
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </delete>
+    <delete id="delete">
+        delete from m_match
+        where m_main_id = #{mMainId,jdbcType=VARCHAR}
+    </delete>
+    <insert id="insert" parameterType="com.jinfei.jfmm.model.mMatch">
+    insert into m_match (f_id, m_main_id, b_match_no,
+      edit_user, edit_time)
+    values (#{fId,jdbcType=VARCHAR}, #{mMainId,jdbcType=VARCHAR}, #{bMatchNo,jdbcType=VARCHAR},
+      #{editUser,jdbcType=VARCHAR}, #{editTime,jdbcType=TIMESTAMP})
+  </insert>
+    <insert id="insertSelective" parameterType="com.jinfei.jfmm.model.mMatch">
+        insert into m_match
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                f_id,
+            </if>
+            <if test="mMainId != null">
+                m_main_id,
+            </if>
+            <if test="bMatchNo != null">
+                b_match_no,
+            </if>
+            <if test="editUser != null">
+                edit_user,
+            </if>
+            <if test="editTime != null">
+                edit_time,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                #{fId,jdbcType=VARCHAR},
+            </if>
+            <if test="mMainId != null">
+                #{mMainId,jdbcType=VARCHAR},
+            </if>
+            <if test="bMatchNo != null">
+                #{bMatchNo,jdbcType=VARCHAR},
+            </if>
+            <if test="editUser != null">
+                #{editUser,jdbcType=VARCHAR},
+            </if>
+            <if test="editTime != null">
+                #{editTime,jdbcType=TIMESTAMP},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jinfei.jfmm.model.mMatch">
+        update m_match
+        <set>
+            <if test="mMainId != null">
+                m_main_id = #{mMainId,jdbcType=VARCHAR},
+            </if>
+            <if test="bMatchNo != null">
+                b_match_no = #{bMatchNo,jdbcType=VARCHAR},
+            </if>
+            <if test="editUser != null">
+                edit_user = #{editUser,jdbcType=VARCHAR},
+            </if>
+            <if test="editTime != null">
+                edit_time = #{editTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.jinfei.jfmm.model.mMatch">
+    update m_match
+    set m_main_id = #{mMainId,jdbcType=VARCHAR},
+      b_match_no = #{bMatchNo,jdbcType=VARCHAR},
+      edit_user = #{editUser,jdbcType=VARCHAR},
+      edit_time = #{editTime,jdbcType=TIMESTAMP}
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </update>
+
+    <select id="getTotal" resultType="java.lang.Integer">
+        SELECT
+        count(0)
+        FROM
+        m_main
+        LEFT JOIN m_model ON m_main.model_id = m_model.f_id
+        <where>
+            <if test="mMainName!=null and mMainName!=''">
+                AND m_main.f_no like concat('%',#{mMainName},'%')
+            </if>
+            <if test="castType!=null and castType!=''">
+                AND m_main.cast_type_id  = #{castType}
+            </if>
+            <if test="prodCate!=null and prodCate!=''">
+                AND m_model.prod_classify_id = #{prodCate}
+            </if>
+        </where>
+    </select>
+
+    <select id="matchList" resultMap="BaseResultMap">
+    SELECT
+      a.f_id AS m_main_id,
+      a.f_no AS mMainName,
+      a.comp_parts AS compParts,
+      b.f_id,b.b_match_no,
+      c.f_name AS partsCate,
+      GROUP_CONCAT(c.match_no) AS matchNo,
+      d.f_name AS mModelName
+    FROM
+        (
+        SELECT
+        m_main.*,
+        m_model.f_name
+        FROM
+        m_main
+        LEFT JOIN m_model ON m_main.model_id = m_model.f_id
+        <where>
+            <if test="mMainName!=null and mMainName!=''">
+                AND m_main.f_no like concat('%',#{mMainName},'%')
+            </if>
+            <if test="castType!=null and castType!=''">
+                AND m_main.cast_type_id  = #{castType}
+            </if>
+            <if test="prodCate!=null and prodCate!=''">
+                AND m_model.prod_classify_id = #{prodCate}
+            </if>
+        </where>
+        limit #{offset},#{pageSize}
+        ) a
+      LEFT JOIN m_match b ON b.m_main_id=a.f_id
+      LEFT JOIN b_main c  ON find_in_set(c.match_no, b.b_match_no )
+      LEFT JOIN m_model d ON a.model_id = d.f_id
+	GROUP BY a.f_id,b.f_id
+
+  </select>
+    <select id="checkFid" resultType="java.lang.Boolean" parameterType="java.lang.String">
+        select count(f_id) from m_match where f_id = #{fId}
+    </select>
+</mapper>

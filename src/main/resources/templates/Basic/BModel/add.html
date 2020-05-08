@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+<style>
+    .help-block{
+        display: block;
+        position: absolute;
+        z-index: 2;
+        margin-top: 35px;
+    }
+</style>
+<body>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-config-add" name="form-config-add">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">部件型号名称：</label>
+            <div class="col-sm-8">
+                <input id="f_name" name="f_name" onchange="setF_name()" class="form-control" type="text" style="width: 80%;float: left;" ><input type="text" id="f_name_hz"  class="form-control" style="width: 20%;float: right;" readonly>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">产品类别：</label>
+            <div class="col-sm-8">
+                <select id="prod_classify_id" name="prod_classify_id" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('prod_cate')}">
+                    <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">产品尺寸：</label>
+            <div class="col-sm-8">
+                <select id="prod_spec_id" name="prod_spec_id" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('prod_spec')}">
+                    <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">部件类别：</label>
+            <div class="col-sm-8">
+                <select id="classify_no" name="classify_no" onchange="setF_name()" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('parts_cate')}">
+                    <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">模具规格：</label>
+            <div class="col-sm-8">
+                <select id="mould_spec_id" name="mould_spec_id" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('mould_spec')}">
+                    <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                </select>
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var prefix = "/Basic/BModel";
+    var f_name = null;
+
+    $(function () {
+        setF_name();
+        $("#form-config-add").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                f_name: {
+                    message: '部件型号名称验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '部件型号名称不能为空'
+                        }
+                    }
+                },
+                prod_classify_id: {
+                    message: '产品类别验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '产品类别不能为空'
+                        }
+                    }
+                },
+                prod_spec_id: {
+                    message: '产品尺寸验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '产品尺寸不能为空'
+                        }
+                    }
+                },
+                classify_no: {
+                    message: '部件类别编码验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '部件类别编码不能为空'
+                        }
+                    }
+                },
+                mould_spec_id: {
+                    message: '模具规格验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '模具规格不能为空'
+                        }
+                    }
+                }
+            }
+        })
+        var bootstrapValidator = $("#form-config-add").data("bootstrapValidator");
+        bootstrapValidator.validate();
+        bootstrapValidator.isValid();
+        setF_name();
+    })
+
+    // function setF_name() {
+    //     var str = '';
+    //     if($("#f_name").val().length==0){
+    //         f_name = $("#classify_no").selectpicker('val');
+    //     } else if (f_name==$("#classify_no").selectpicker('val')){
+    //         f_name = $("#classify_no").selectpicker('val');
+    //         str =  $("#f_name").val() + f_name;
+    //     } else {
+    //         var text = $("#f_name").val();
+    //        str = replacepos(text,text.length-f_name.length,text.length-1,$("#classify_no").selectpicker('val'));
+    //        f_name = $("#classify_no").selectpicker('val');
+    //     }
+    //     $("#f_name").val(str);
+    // }
+
+    function setF_name() {
+            f_name = $("#classify_no").selectpicker('val');
+        $("#f_name_hz").val(f_name);
+    }
+
+    function replacepos(text,start,stop,replacetext) {
+        var mystr = text.substring(0, stop - 1) + replacetext + text.substring(stop + 1);
+        return mystr;
+    }
+
+    function submitHandler() {
+        var bootstrapValidator = $("#form-config-add").data("bootstrapValidator");
+        bootstrapValidator.validate();
+        var obj =  $('#form-config-add').serializeObject();
+        obj.f_name += "-"+$("#f_name_hz").val();
+        // console.log(obj)
+        if (bootstrapValidator.isValid()) {
+            $.operate.save(prefix+"/addSave", obj);
+        }
+    }
+
+    $.fn.serializeObject = function(){
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function() {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+
+</script>
+</body>
+</html>

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <input type="hidden" id="part_id" name="part_id">
+        <input type="hidden" id="f_name" name="f_name">
+        <input type="hidden" id="match_no" name="match_no">
+        <input type="hidden" id="f_no" name="f_no">
+        <input type="hidden" id="mmd_name" name="mmd_name">
+        <div class="col-sm-12 search-collapse">
+            <form id="dept-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            匹配号：<input type="text" name="match_no">
+                        </li>
+                        <li>
+                            专属模具编号：<input type="text" name="f_no">
+                        </li>
+                        <li>
+                            专属模具型号：<input type="text" name="mmd_name">
+                        </li>
+                        <li>
+                            部件型号：<input type="text" name="model_name">
+                        </li>
+                        <li>
+                            铸造类型:
+                            <select id="cast_type_id" name="cast_type_id" class="selectpicker" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('cast_type')}">
+                                <option value="">请选择类型</option>
+                                <option th:each="dict : ${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <button class="btn btn-primary " type="button" onclick="$.table.search()"><i class="fa fa-check"></i>&nbsp;搜索
+                            </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-danger " type="button" onclick="$.form.reset()"><i class="fa fa-adjust"></i>&nbsp;重置
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <!-- Panel Other -->
+
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+</body>
+<script th:inline="javascript">
+    var prod_cate = [[${@dict.getType('prod_cate')}]];
+    var prod_spec = [[${@dict.getType('prod_spec')}]];
+    var parts_cate = [[${@dict.getType('parts_cate')}]];
+    var mould_spec = [[${@dict.getType('mould_spec')}]];
+    var LZ_TYPE = [[${@dict.getType('LZ_TYPE')}]];
+    var boo = [[${@dict.getType('boolen')}]];
+    var cast_type = [[${@dict.getType('cast_type')}]];
+    var unit = [[${@dict.getType('unit')}]];
+    var mould_mater = [[${@dict.getType('mould_mater')}]];
+    var asset_states = [[${@dict.getType('asset_states')}]];
+    var mould_state = [[${@dict.getType('mould_state')}]];
+    var cust = [[${@cust.getCustList()}]];
+    var seat = [[${@seat.getSeatList()}]];
+    var prefix =  "/Basic/Main";
+    var mould_id = getUrlPara("mould_id");
+    var classify_no = getUrlPara("classify_no");
+    var url = prefix+"/selectAll?is_pop=true";
+    if (mould_id != null&&classify_no!=null){
+        url+="&mould_id="+mould_id+"&classify_no="+classify_no+"&selectByMould=true";
+    }
+    $(function() {
+        var options = {
+            uniqueId: "f_id",
+            url: url,
+            // createUrl: prefix + "/add.html",
+            // updateUrl: prefix + "/edit/{id}",
+            // removeUrl: prefix + "/remove",
+            // exportUrl: prefix + "/export",
+            sortName: "f_name",
+            sortOrder: "asc",
+            pagination: true,                   //是否显示分页（*）
+            modalName: "部件",
+            clickToSelect:true,
+            singleSelect:true,
+            search: false,
+            showExport: false,
+            showColumns:false,
+            showToggle:false,
+            showRefresh:false,
+            sidePagination:'server',
+            onCheckAll: function (rows) {
+                checkRow(rows);
+            },
+            onUncheckAll: function (rows) {
+                checkRow(rows)
+            },
+            onCheck: function (rows) {
+                checkRow(rows)
+            },
+            onUncheck:function(rows){
+                checkRow(rows)
+            },
+            columns: [{
+                checkbox: true
+            },
+                // {
+                //     field: 'f_id',
+                //     title: '部件名称',
+                //     // halign:"center"
+                // },
+                {
+                    field: 'f_name',
+                    title: '部件名称',
+                },
+                {
+                    field: 'match_no',
+                    title: '匹配号',
+                    // halign:"center"
+                },
+                {
+                    field: 'model_name',
+                    title: '部件型号',
+                    // halign:"center"
+                },
+                {
+                    field: 'prod_classify_id',
+                    title: '产品类别',
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(prod_cate, value);
+                    }
+                },
+                {
+                    field: 'cast_type_id',
+                    title: '模具类型',
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(cast_type, value);
+                    }
+                },
+                {
+                    field: 'unit',
+                    title: '单位',
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(unit, value);
+                    }
+                },
+                {
+                    field: 'spec_id',
+                    title: '模具规格',
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(mould_spec, value);
+                    }
+                },
+                {
+                    field: 'f_no',
+                    title: '专属模具编号',
+                    // halign:"center"
+                    align: 'center',
+                },
+                {
+                    field: 'mmd_name',
+                    title: '专属模具型号',
+                    // halign:"center",
+                    align:"right",
+                },
+                {
+                    field: 'prod_spec_id',
+                    title: '产品尺寸',
+                    // halign:"center",
+                    align:"right",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(prod_spec, value);
+                    }
+                },
+                {
+                    field: 'mould_mater_id',
+                    title: '模具材料',
+                    // halign:"center",
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(mould_mater, value);
+                    }
+                },
+                {
+                    field: 'assets_state',
+                    title: '资产状态',
+                    // halign:"center",
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(asset_states, value);
+                    }
+                },
+                {
+                    field: 'mould_state',
+                    title: '模具状态',
+                    // halign:"center",
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(mould_state, value);
+                    }
+                },
+                {
+                    field: 'cust_id',
+                    title: '配套厂家',
+                    // halign:"center",
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return getText(cust,value);
+                    }
+                },
+                {
+                    field: 'make_fty_id',
+                    title: '制造厂家',
+                    // halign:"center",
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return getText(cust,value);
+                    }
+                },
+                {
+                    field: 'heat_fty_id',
+                    title: '热处理厂家',
+                    // halign:"center",
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return getText(cust,value);
+                    }
+                },
+                {
+                    field: 'life_sum',
+                    title: '寿命统计',
+                    // halign:"center",
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(boo, value);
+                    }
+                },
+                {
+                    field: 'usages',
+                    title: '已用寿命',
+                    // halign:"center",
+                    align:"center",
+                },
+                {
+                    field: 'usage_max',
+                    title: '设置寿命',
+                    // halign:"center",
+                    align:"center",
+                },
+                {
+                    field: 'location_org_name',
+                    title: '所在地',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'trans_state',
+                    title: '转运状态',
+                    // halign:"center",
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(LZ_TYPE, value);
+                    }
+                },
+                {
+                    field: 'is_in_library',
+                    title: '是否在库',
+                    // halign:"center",
+                    align:"center",
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(boo, value);
+                    }
+                },
+                {
+                    field: 'happen_time',
+                    title: '发生时间',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'org_name',
+                    title: '开模申请事业部',
+                    // halign:"center",
+                    align: "center"
+                },
+                {
+                    field: 'make_cost',
+                    title: '开模费用',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'd1',
+                    title: '申报时间',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'd2',
+                    title: '要求到厂时间',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'accep_into_factory_no',
+                    title: '进厂验收单编号',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'accep_no',
+                    title: '验收单编号',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'transfer_order_no',
+                    title: '移交单编号',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'd3',
+                    title: '到厂时间',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'accep_finish_time',
+                    title: '验收完成时间',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'trial_start_time',
+                    title: '试制开始时间',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'trial_finish_time',
+                    title: '试制完成时间',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: '',
+                    title: '试制天数',
+                    // halign:"center",
+                    align:"center",
+                    formatter:function (value, row, index) {
+                        var date1= new Date(row.trial_start_time);  //开始时间
+                        var date2 = new Date(row.trial_finish_time);    //结束时间
+                        var date3 = date2.getTime() - new Date(date1).getTime();   //时间差的毫秒数
+                        //计算出相差天数
+                        var days=Math.floor(date3/(24*3600*1000))
+                        return days+"天";
+                    }
+                },
+                {
+                    field: 'last_upkeep_time',
+                    title: '上次保养时间',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'scrap_time',
+                    title: '报废时间',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+                {
+                    field: 'reuse_time',
+                    title: '回用时间',
+                    // halign:"center",
+                    align:"center",
+                    // formatter:function (value, row, index) {
+                    //     return formatterDate(value)
+                    // }
+                },
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function checkRow(row){
+        $("#f_name").val(row.f_name)
+        $("#part_id").val(row.f_id)
+        $("#match_no").val(row.match_no)
+        $("#f_no").val(row.f_no)
+        $("#mmd_name").val(row.mmd_name)
+    }
+
+    function getText(obj,value) {
+        var fName = "";
+        $.each(obj,function (i,v) {
+            if (v.fId==value){
+                fName = v.fName;
+            }
+        });
+        return fName
+    }
+
+    function formatterDate(time) {
+        var date = new Date(time);
+        var str = date.getFullYear()+"-"+jl(date.getMonth()+1)+"-"+jl(date.getDate())+" "+jl(date.getHours())+":"+jl(date.getMinutes())+":"+jl(date.getSeconds());
+        return str;
+    }
+
+    function jl(value) {
+        if (value.toString().length<=1){
+            return "0"+value;
+        } else {
+            return value;
+        }
+    }
+
+    function getUrlPara(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var url=decodeURI(decodeURI(window.location.search))
+        var r = url.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+
+</script>
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_bootstrap.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:06 GMT -->
+</html>

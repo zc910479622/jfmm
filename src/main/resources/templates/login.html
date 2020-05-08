@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+<link th:href="@{/css/login.min.css}" rel="stylesheet">
+
+
+<body class="signin">
+<div class="signinpanel">
+    <div class="row">
+        <div class="col-sm-7">
+            <div class="signin-info">
+                <div class="logopanel m-b">
+                    <h1>今飞模具管理</h1>
+                </div>
+                <div class="m-b"></div>
+                <h4>欢迎使用 <strong>今飞模具管理系统</strong></h4>
+                <ul class="m-b">
+                    <!--                    <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> 匠心制造</li>-->
+                    <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> 操纵未来，绿色前行</li>
+                    <!--                    <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> 优势三</li>-->
+                    <!--                    <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> 优势四</li>-->
+                    <!--                    <li><i class="fa fa-arrow-circle-o-right m-r-xs"></i> 优势五</li>-->
+                </ul>
+            </div>
+        </div>
+        <div class="col-sm-5">
+            <form id="login-form">
+                <h4 class="no-margins">登录：</h4>
+                <div class="form-group">
+                    <input type="text" id="username" name="username" class="form-control uname" placeholder="用户名"/>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" name="password" class="form-control pword" placeholder="密码"/>
+                </div>
+                <button class="btn btn-success btn-block" id="btnSubmit" onclick="login()" data-loading="正在验证登录，请稍后...">
+                    登录
+                </button>
+                <!--                <a href="#">忘记密码了？</a>-->
+            </form>
+        </div>
+    </div>
+    <div class="signup-footer">
+        <div class="pull-right"> v1.0.0 &nbsp;&nbsp;&copy; 2019 <a href="#" target="_blank">浙江因特物联有限公司</a>
+        </div>
+    </div>
+</div>
+</body>
+<div th:include="include::footer"></div>
+<script>
+    window.onload = function () {
+        if (window.parent.window != window) {
+            window.top.location = "/login.html";
+        }
+    }
+
+    function login() {
+        var bootstrapValidator = $("#login-form").data('bootstrapValidator');
+        bootstrapValidator.validate();
+        if (bootstrapValidator.isValid()) {
+            $.modal.loading($("#btnSubmit").data("loading"));
+            $.ajax({
+                type: "post",
+                url: "login.action",
+                data: {
+                    "loginName": $("#username").val(),
+                    "password": $("#password").val()
+                },
+                success: function (r) {
+                    if (r.code == 0) {
+                        location.href = 'index';
+                    } else {
+                        $.modal.closeLoading();
+                        if (r.msg.replace('\u4e00-\u9fa5')) {
+                            $.modal.msg(r.msg);
+                        } else {
+                            $.modal.msg("系统错误请联系管理员");
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    $('#username,#password').bind('keyup', function (event) {
+        if (event.keyCode == "13") {
+            //回车执行查询
+            login()
+        }
+    });
+
+    var icon = "<i class='fa fa-times-circle'></i> ";
+    $("#login-form").bootstrapValidator({
+        message: 'This value is not valid',
+        feedbackIcons: {
+            valid: 'glyphicon glyphicon-ok',
+            invalid: 'glyphicon glyphicon-remove',
+            validating: 'glyphicon glyphicon-refresh'
+        },
+        fields: {
+            username: {
+                message: '部门名称验证失败',
+                validators: {
+                    notEmpty: {
+                        message: icon + '用户名不能为空'
+                    }
+                }
+            },
+            password: {
+                validators: {
+                    notEmpty: {
+                        message: icon + '密码不能为空'
+                    }
+                }
+            }
+        }
+    })
+
+
+</script>
+</html>

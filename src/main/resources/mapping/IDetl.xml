@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.IIDetlDao" >
+    <resultMap id="ResultBase" type="com.jinfei.jfmm.model.IDetl">
+        <result property="f_id" column="f_id" jdbcType="VARCHAR"/>
+        <result property="main_id" column="main_id" jdbcType="VARCHAR"/>
+        <result property="f_name" column="f_name" jdbcType="VARCHAR"/>
+        <result property="match_no" column="match_no" jdbcType="VARCHAR"/>
+        <result property="part_id" column="part_id" jdbcType="VARCHAR"/>
+        <result property="order_no" column="order_no" jdbcType="INTEGER"/>
+        <result property="rece_time" column="rece_time" jdbcType="TIMESTAMP"/>
+        <result property="seat_id" column="seat_id" jdbcType="VARCHAR"/>
+        <result property="rece_edit_time" column="rece_edit_time" jdbcType="VARCHAR"/>
+        <result property="img_path" column="file_src" jdbcType="VARCHAR"/>
+        <result property="isHG" column="isHG" jdbcType="INTEGER"/>
+    </resultMap>
+    <update id="receTime">
+        update l_detl
+        set   rece_time = current_timestamp()
+        where f_id = #{f_id,jdbcType=VARCHAR}
+    </update>
+
+    <update id="path">
+        update l_deti_file
+        set   file_src = #{img_path}
+        where detl_id = #{f_id}
+    </update>
+
+    <select id="selectAll" resultMap="ResultBase" parameterType="com.jinfei.jfmm.model.IDetl">
+        select * from l_detl left join b_main on l_detl.part_id = b_main.f_id left join l_deti_file f on l_detl.f_id = f.detl_id
+        <where>
+            <trim suffixOverrides="and">
+                <if test="f_id != null">
+                    f_id = #{f_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="main_id != null">
+                    main_id = #{main_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="part_id != null">
+                    part_id = #{part_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="order_no != null">
+                    order_no = #{order_no,jdbcType=INTEGER} and
+                </if>
+                <if test="rece_time != null">
+                    rece_time = #{rece_time,jdbcType=VARCHAR} and
+                </if>
+                <if test="seat_id != null">
+                    seat_id = #{seat_id,jdbcType=VARCHAR}
+                </if>
+                <if test="rece_edit_time != null">
+                    rece_edit_time = #{rece_edit_time,jdbcType=VARCHAR}
+                </if>
+            </trim>
+        </where>
+        <if test="orderByColumn!=null">
+            order by #{orderByColumn} #{isAsc}
+        </if>
+    </select>
+
+    <insert id="add" parameterType="java.util.List">
+        insert into l_detl
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            f_id,
+            main_id,
+            part_id,
+            order_no,
+            rece_time,
+            seat_id,
+            rece_edit_time,
+            isHG
+        </trim>
+        values
+        <foreach item="item" collection="list" separator="," index="">
+            <trim prefix=" (" suffix=")" suffixOverrides=",">
+                <if test="item.f_id != null">
+                    #{item.f_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.main_id != null">
+                    #{item.main_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.part_id != null">
+                    #{item.part_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.order_no != null">
+                    #{item.order_no,jdbcType=INTEGER},
+                </if>
+                <if test="item.rece_time != null">
+                    #{item.rece_time,jdbcType=VARCHAR},
+                </if>
+                <if test="item.seat_id != null">
+                    #{item.seat_id,jdbcType=VARCHAR},
+                </if>
+                <if test="item.rece_edit_time != null">
+                    #{item.rece_edit_time,jdbcType=VARCHAR},
+                </if>
+                <choose>
+                    <when test="item.isHG !=null">
+                        #{item.isHG,jdbcType=INTEGER}
+                    </when>
+                    <otherwise>
+                        0
+                    </otherwise>
+                </choose>
+            </trim>
+        </foreach>
+        ON DUPLICATE KEY UPDATE part_id = values(part_id) , order_no = values(order_no) , rece_time = values(rece_time) , seat_id = values(seat_id),rece_edit_time = values(rece_edit_time),isHG= values(isHG)
+    </insert>
+
+    <insert id="saveIMG" parameterType="java.util.List">
+        <foreach item="item" collection="list" separator=";" index="">
+            <choose>
+                <when test="item.img_path != null and item.img_path != ''">
+                    insert into l_deti_file
+                    <trim prefix="(" suffix=")" suffixOverrides=",">
+                        f_id,
+                        <if test="item.f_id != null">
+                            detl_id,
+                        </if>
+                        <if test="item.img_path != null and item.img_path != ''">
+                            file_src,
+                        </if>
+                        edit_time
+                    </trim>
+                    values
+                    <trim prefix=" (" suffix=")" suffixOverrides=",">
+                        UUID(),
+                        <if test="item.f_id != null">
+                            #{item.f_id,jdbcType=VARCHAR},
+                        </if>
+                        <if test="item.img_path != null and item.img_path != ''">
+                            #{item.img_path,jdbcType=VARCHAR},
+                        </if>
+                        now()
+                    </trim>
+                    ON DUPLICATE KEY UPDATE file_src = values(file_src)
+                </when>
+                <otherwise>
+                    insert into l_deti_file
+                    <trim prefix="(" suffix=")" suffixOverrides=",">
+                        f_id,
+                        <if test="item.f_id != null">
+                            detl_id,
+                        </if>
+                        <if test="item.img_path != null and item.img_path != ''">
+                            file_src,
+                        </if>
+                        edit_time
+                    </trim>
+                    values
+                    <trim prefix=" (" suffix=")" suffixOverrides=",">
+                        UUID(),
+                        <if test="item.f_id != null">
+                            #{item.f_id,jdbcType=VARCHAR},
+                        </if>
+                        <if test="item.img_path != null and item.img_path != ''">
+                            #{item.img_path,jdbcType=VARCHAR},
+                        </if>
+                        now()
+                    </trim>
+                    ON DUPLICATE KEY UPDATE file_src = file_src
+                </otherwise>
+            </choose>
+
+        </foreach>
+    </insert>
+
+    <delete id="remove" parameterType="java.util.ArrayList">
+        delete from l_detl where f_id in
+        <foreach item="item" collection="array" separator="," open="(" close=")" index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+
+    <delete id="removeByMainId" parameterType="java.util.ArrayList">
+        delete from l_detl where main_id in
+        <foreach item="item" collection="array" separator="," open="(" close=")" index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+</mapper>

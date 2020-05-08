@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinfei.jfmm.dao.zcReportMapper">
+    <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.zcReport">
+        <result column="m_main_name" jdbcType="VARCHAR" property="mMainName"/>
+        <result column="m_model_name" jdbcType="VARCHAR" property="mModelName"/>
+        <result column="m_main_nums" jdbcType="INTEGER" property="mMainNums"/>
+        <result column="part_name" jdbcType="VARCHAR" property="partName"/>
+        <result column="seat_name" jdbcType="VARCHAR" property="seatName"/>
+        <result column="part_nums" jdbcType="VARCHAR" property="partNums"/>
+        <result column="location" jdbcType="VARCHAR" property="location"/>
+        <result column="rack_position" jdbcType="VARCHAR" property="rackPosition"/>
+        <result column="request_org" jdbcType="VARCHAR" property="requestOrg"/>
+        <result column="assets_state" jdbcType="VARCHAR" property="assetsState"/>
+        <result column="is_complete" jdbcType="INTEGER" property="isComplete"/>
+        <result column="Amortization" jdbcType="TINYINT" property="amortization"/>
+        <result column="cast_type_id" jdbcType="VARCHAR" property="castTypeId"/>
+        <result column="prod_spec_id" jdbcType="VARCHAR" property="prodSpecId"/>
+        <result column="partPrices" jdbcType="DECIMAL" property="partPrices"/>
+        <result column="w_cost" jdbcType="INTEGER" property="wCost"/>
+        <result column="amortization_time" jdbcType="VARCHAR" property="amortizationTime"/>
+    </resultMap>
+    <select id="list" resultMap="BaseResultMap">
+    SELECT * FROM zc_report
+  </select>
+    <select id="getTotal" resultType="java.lang.Integer">
+        SELECT COUNT(0) FROM (
+        SELECT
+        zc_report.*,
+        m_main.Amortization
+        FROM
+        zc_report
+        LEFT JOIN m_main ON m_main.f_no = zc_report.m_main_name
+        WHERE NOT ISNULL(zc_report.m_main_name) and NOT ISNULL(m_main.Amortization)
+        <if test="mMainName != '' and mMainName != null ">
+            AND zc_report.m_main_name like CONCAT('%',#{mMainName},'%')
+        </if>
+        <if test="location != '' and location != null ">
+            AND zc_report.location = #{location}
+        </if>
+        <if test="requestOrg != '' and requestOrg != null ">
+            AND zc_report.request_org = #{requestOrg}
+        </if>
+        GROUP BY
+        zc_report.location,
+        zc_report.m_main_name) a
+    </select>
+    <select id="mainList" parameterType="com.jinfei.jfmm.model.zcReport" resultMap="BaseResultMap">
+        SELECT
+        zc_report.*,m_main.Amortization,m_main.amortization_time,m_main.cast_type_id,m_model.prod_spec_id,
+        m_cost.w_cost
+        FROM zc_report
+        LEFT JOIN m_main ON m_main.f_no = zc_report.m_main_name
+        LEFT JOIN m_model ON m_main.model_id = m_model.f_id
+        LEFT JOIN a_dict ON a_dict.f_value = m_model.prod_spec_id AND a_dict.f_pid = '16'
+        LEFT JOIN m_cost ON m_cost.f_id = a_dict.f_id AND m_cost.cast_type = m_main.cast_type_id AND m_cost.prod_cate = m_model.prod_classify_id
+        WHERE NOT ISNULL(zc_report.m_main_name) and NOT ISNULL(m_main.Amortization)
+        <if test="mMainName != '' and mMainName != null ">
+            AND zc_report.m_main_name like CONCAT('%',#{mMainName},'%')
+        </if>
+        <if test="location != '' and location != null ">
+            AND zc_report.location = #{location}
+        </if>
+        <if test="requestOrg != '' and requestOrg != null ">
+            AND zc_report.request_org = #{requestOrg}
+        </if>
+        GROUP BY zc_report.location,zc_report.m_main_name
+        <if test="offset != null and pageSize != null">
+            limit #{offset},#{pageSize}
+        </if>
+    </select>
+</mapper>

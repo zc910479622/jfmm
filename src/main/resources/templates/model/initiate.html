@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+
+<div th:include="include::footer"></div>
+</body>
+<script th:inline="javascript">
+    $(function () {
+        var options = {
+            uniqueId: "f_id",
+            url: "/models/deploymentList",
+            createUrl: "/add",
+            updateUrl: "/edit/{id}",
+            removeUrl: "/remove",
+            exportUrl: "/export",
+            sortName: "f_name",
+            sortOrder: "asc",
+            pagination: true,                   //是否显示分页（*）
+            modalName: "部件型号",
+            search: false,
+            showExport: false,
+            columns: [{
+                checkbox: true
+            },
+                // {
+                //     field: 'f_id',
+                //     title: '部件名称',
+                //     // halign:"center"
+                // },
+                {
+                    field: 'id',
+                    title: 'ID',
+                    align: "center",
+                    width:"15%"
+                },
+                {
+                    field: 'name',
+                    title: '流程',
+                    align: "center",
+                    width:"15%"
+                },
+                {
+                    field: 'key',
+                    title: 'key',
+                    align: "center",
+                    width:"15%"
+                },
+                {
+                    field: 'version',
+                    title: '版本',
+                    align: "center",
+                    width:"15%"
+                },
+                {
+                    field: 'deploymentId',
+                    title: '部署ID',
+                    align: "center",
+                    width:"15%"
+                },
+                {
+                    field: 'mould_spec_id',
+                    title: '操作',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        actions.push('<a href="/activiti/start/'+row.id+'" class="btn btn-info  btn-xs font-blue deployBtn">发起流程</a> ');
+                        return actions.join('');
+                    }
+                }
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function deployment(obj) {
+        var id = obj.attributes['objectid'].nodeValue;
+        $.ajax({
+            url: "/models/deployment/" + id,
+            type: "GET",
+            success: function (res) {
+                alert(res);
+            }
+        });
+
+    }
+
+    function deleteProcess(obj) {
+        var id = obj.attributes['objectid'].nodeValue;
+        $.ajax({
+            url: "/models/delete/" + id,
+            type: "GET",
+            success: function (res) {
+                alert(res);
+            }
+        });
+    }
+
+    function start(obj) {
+        var id = obj.attributes['objectid'].nodeValue;
+        $.ajax({
+            url: '/models/start/' + id,
+            type: 'GET',
+            success: function (res) {
+                alert(res);
+            }
+        });
+    }
+
+    function taskList() {
+        $("#taskList").submit();
+    }
+</script>
+</html>

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.kSeatMapper" >
+  <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.kSeat" >
+    <id column="f_id" property="fId" jdbcType="VARCHAR" />
+    <result column="shelf_id" property="shelfId" jdbcType="VARCHAR" />
+    <result column="f_name" property="fName" jdbcType="VARCHAR" />
+    <result column="is_state" property="is_state" jdbcType="BIT"/>
+
+  </resultMap>
+  <sql id="Base_Column_List" >
+    f_id, shelf_id, f_name,is_state
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from k_seat
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from k_seat
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insertSelective" parameterType="com.jinfei.jfmm.model.kSeat" >
+    insert into k_seat
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="fId != null" >
+        f_id,
+      </if>
+      <if test="shelfId != null" >
+        shelf_id,
+      </if>
+      <if test="fName != null" >
+        f_name,
+      </if>
+      <if test="is_state != null" >
+        is_state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="fId != null" >
+        #{fId,jdbcType=VARCHAR},
+      </if>
+      <if test="shelfId != null" >
+        #{shelfId,jdbcType=VARCHAR},
+      </if>
+      <if test="fName != null" >
+        #{fName,jdbcType=VARCHAR},
+      </if>
+      <if test="is_state != null" >
+        #{is_state,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jinfei.jfmm.model.kSeat" >
+    update k_seat
+    <set >
+      <if test="shelfId != null" >
+        shelf_id = #{shelfId,jdbcType=VARCHAR},
+      </if>
+      <if test="fName != null" >
+        f_name = #{fName,jdbcType=VARCHAR},
+      </if>
+      <if test="is_state != null" >
+        is_state = #{is_state,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </update>
+  <update id="editIsStatus" parameterType="java.lang.String">
+    update k_seat set is_state = 0 where shelf_id = #{fId}
+  </update>
+  <update id="editIsStatusAll" parameterType="java.lang.String">
+    UPDATE `db_jfmm`.`k_seat`
+    SET
+        is_state = 0
+    WHERE
+	    shelf_id in (SELECT CONCAT(f_id) FROM k_shelf WHERE area_id=#{fId});
+  </update>
+  <select id="list" resultMap="BaseResultMap">
+    select * from k_seat
+  </select>
+  <select id="getOption" resultMap="BaseResultMap">
+    select * from k_seat Where shelf_id = #{fPid}
+    <if test="state != 0">
+      and is_state != 0
+    </if>
+  </select>
+  <select id="getSeatWare" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select * from k_seat
+    <if test="fId != null and fId != '' ">
+      Where  f_id = #{fId}
+    </if>
+  </select>
+  <select id="getSeat" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select * from k_seat Where is_state != 0
+    <if test="fId != null and fId != '' ">
+         and f_id = #{fId}
+      </if>
+  </select>
+  <select id="getChildren" resultMap="BaseResultMap">
+    select * from k_seat Where shelf_id = #{fPid}
+    <if test="fId!=null and fId!=''">
+        AND f_id = #{fId}
+    </if>
+  </select>
+</mapper>

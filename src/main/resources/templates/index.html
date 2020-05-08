@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="Cache-Control" content="no-siteapp"/>
+    <title>今飞控股集团有限公司</title>
+    <meta name="keywords" content="今飞集团,因特物联,工业4.0,智能制造,无人工厂,MES,模具管理">
+
+    <link rel="shortcut icon" th:href="@{/img/ico01_32X32.ico}">
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet">
+    <link th:href="@{/css/font-awesome.min.css}" rel="stylesheet">
+    <link th:href="@{/css/animate.min.css}" rel="stylesheet">
+    <link th:href="@{/css/style.min.css}" rel="stylesheet">
+    <link th:href="@{/js/plugins/bootstrapvalidator/css/bootstrapValidator.min.css}" rel="stylesheet">
+    <link th:href="@{/css/plugins/bootstrap-fileinput/css/fileinput.css}" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <meta http-equiv="refresh" content="0;ie.html"/>
+    <![endif]-->
+</head>
+<body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
+<div id="wrapper">
+    <!--左侧导航开始-->
+    <nav class="navbar-default navbar-static-side" role="navigation">
+        <div class="nav-close"><i class="fa fa-times-circle"></i>
+        </div>
+        <div class="sidebar-collapse">
+            <ul class="nav" id="side-menu">
+                <li class="nav-header" id="menu-header" style="background: url('/img/header-profile.png')">
+                    <div class="dropdown profile-element" style="overflow:hidden;">
+                        <div class="pull-left" style="margin-top:10%;">
+                            <img alt="image" class="" src="img/ico01_32X32.ico">
+                        </div>
+                        <h2 class="pull-right" style="font-size: 20px;font-weight:bold;color: #a7b1c2">模具管理系统</h2>
+                    </div>
+                    <div class="logo-element"><img src="img/ico01_32X32.ico">
+                    </div>
+                </li>
+                <!-- 此处js动态创建菜单项 -->
+                <li th:each="menu : ${menus}">
+                    <a href="#">
+                        <i th:class="${menu.icon}"></i>
+                        <span class="nav-label" th:text="${menu.menuName}">一级菜单</span>
+                        <span class="fa arrow"></span>
+                    </a>
+                    <ul class="nav nav-second-level collapse">
+                        <li th:each="cmenu : ${menu.children}">
+                            <a th:if="${#lists.isEmpty(cmenu.children)}" class="J_menuItem" th:utext="${cmenu.menuName}"
+                               th:href="@{${cmenu.url}}">二级菜单</a>
+                            <a th:if="${not #lists.isEmpty(cmenu.children)}" href="#">[[${cmenu.menuName}]]<span
+                                    class="fa arrow"></span></a>
+                            <ul th:if="${not #lists.isEmpty(cmenu.children)}" class="nav nav-third-level">
+                                <li th:each="emenu : ${cmenu.children}"><a class="J_menuItem" th:text="${emenu.menuName}"
+                                                                           th:href="@{${emenu.url}}">三级菜单</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <!--左侧导航结束-->
+
+    <!--右侧部分开始-->
+    <div id="page-wrapper" class="gray-bg dashbard-1">
+        <div class="row border-bottom">
+            <nav class="navbar navbar-static-top" role="navigation" style="margin-bottom: 0">
+                <div class="navbar-header"><a class="navbar-minimalize minimalize-styl-2 btn btn-primary " href="#"><i
+                        class="fa fa-bars"></i> </a>
+                </div>
+                <ul class="nav navbar-top-links navbar-right">
+                    <li class="dropdown user-menu">
+                        <a href="javascript:" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown">
+                            <span class="hidden-xs">欢迎,[[${user.loginName}]]</span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <!--<li class="mt5">
+                                <a href="/system/user/profile" class="menuItem" data-index="19">
+                                    <i class="fa fa-user"></i> 个人中心</a>
+                            </li>
+                            <li>
+                                <a onclick="resetPwd()" class="menuItem" data-index="20">
+                                    <i class="fa fa-key"></i> 修改密码</a>
+                            </li>
+                            <li class="divider"></li>-->
+                            <li>
+                                <a href="logout">
+                                    <i class="fa fa-sign-out"></i> 退出登录</a>
+                            </li>
+                        </ul>
+                    </li>
+
+                </ul>
+            </nav>
+        </div>
+
+        <div class="row content-tabs">
+            <button class="roll-nav roll-left J_tabLeft"><i class="fa fa-backward"></i>
+            </button>
+            <nav class="page-tabs J_menuTabs">
+                <div class="page-tabs-content">
+                    <a href="javascript:;" class="active J_menuTab" data-id="index_v1.html">首页</a>
+                </div>
+            </nav>
+            <button class="roll-nav roll-right J_tabRight"><i class="fa fa-forward"></i>
+            </button>
+            <div class="btn-group roll-nav roll-right">
+                <button class="dropdown J_tabClose" data-toggle="dropdown">关闭操作<span class="caret"></span>
+
+                </button>
+                <ul role="menu" class="dropdown-menu dropdown-menu-right">
+                    <li class="J_tabShowActive"><a>定位当前选项卡</a>
+                    </li>
+                    <li class="divider"></li>
+                    <li class="J_tabCloseAll"><a>关闭全部选项卡</a>
+                    </li>
+                    <li class="J_tabCloseOther"><a>关闭其他选项卡</a>
+                    </li>
+                </ul>
+            </div>
+            <a href="#" class="roll-nav roll-right J_tabExit"><i class="fa fa-refresh"></i> 刷新</a>
+        </div>
+        <div class="row J_mainContent" id="content-main">
+            <iframe class="J_iframe" name="iframe0" width="100%" height="100%" src="" frameborder="0"
+                    data-id="admin/block-home/home.html" seamless></iframe>
+        </div>
+        <div class="footer">
+            <div class="pull-right"> v1.1.2 &nbsp;&nbsp;&copy; 2019 <a href="#" target="_blank">浙江因特物联有限公司</a>
+            </div>
+        </div>
+    </div>
+    <!--右侧部分结束-->
+</div>
+<script src="js/jquery.min.js?v=2.1.4"></script>
+<script src="js/bootstrap.min.js?v=3.3.6"></script>
+<script src="js/plugins/metisMenu/jquery.metisMenu.js"></script>
+<script src="js/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="js/plugins/layer/layer.min.js"></script>
+<script src="js/hplus.min.js?v=4.1.0"></script>
+<script type="text/javascript" src="js/contabs.min.js"></script>
+<script src="js/plugins/pace/pace.min.js"></script>
+<script src="js/plugins/bootstrapvalidator/js/bootstrapValidator.min.js"></script>
+<script src="js/plugins/bootstrapvalidator/js/language/zh_CN.js"></script>
+<script src="css/plugins/bootstrap-fileinput/js/fileinput.js"></script>
+<script src="css/plugins/bootstrap-fileinput/js/locales/zh.js"></script>
+</body>
+</html>

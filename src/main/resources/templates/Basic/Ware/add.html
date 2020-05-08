@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<body>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal " id="form-add" name="form-add">
+        <input name="fId" id="fId" hidden value="">
+        <input name="type" id="type" hidden th:value="${type}">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">名称：</label>
+            <div class="col-sm-8">
+                <input id="fName" name="fName" class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">上级库：</label>
+            <div class="col-sm-8">
+                <input id="fPidName" class="form-control treeview-input" onclick="selectWareTree()" type="text"
+                       readonly="true" th:value="${ware.fName}">
+                <input name="fPid" id="fPid" type="hidden" th:value="${ware.fId}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">是否启用：</label>
+            <div class="col-sm-8">
+                <input type="checkbox" class="checkbox" data-switch-value="Large"
+                       data-on-text="是" data-off-text="否" data-off-color="danger" data-on-color="success"/>
+                <input name="status" type="hidden">
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var prefix = "/Basic/Ware";
+
+    $(".checkbox").bootstrapSwitch({
+        onSwitchChange: function (event, state) {
+            //监听switch change事件，可以根据状态把相应的业务逻辑代码写在这里
+            if (state == true) {
+                $(this).parent().parent().next().val("1");
+            } else {
+                $(this).parent().parent().next().val("0");
+            }
+        }
+    })
+
+    $(".checkbox[type='checkbox']").bootstrapSwitch("toggleState");
+
+
+    $("#fId").val(guid());
+
+    $(function () {
+        $("#form-add").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                fName: {
+                    message: '名称验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '名称不能为空'
+                        }
+                    }
+                },
+            }
+        })
+    })
+
+    function submitHandler() {
+
+        var bootstrapValidator = $("#form-add").data('bootstrapValidator');
+        bootstrapValidator.validate();
+        if (bootstrapValidator.isValid()) {
+            $.operate.save(prefix + "/add", $('#form-add').serialize());
+        }
+    }
+
+    /*部门管理-新增-选择父部门树*/
+    function selectWareTree() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Ware/selectWareTree/" + ($("#fPid").val() ? $("#fPid").val() : "1") + "," + $("#type").val(),
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmit(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        $("#fPid").val(body.find('#treeId').val());
+        $("#fPidName").val(body.find('#treeName').val());
+        $("#type").val(body.find('#treeType').val());
+        layer.close(index);
+    }
+
+</script>
+</body>
+</html>

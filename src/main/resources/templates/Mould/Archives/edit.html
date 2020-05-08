@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<style>
+    .card-view{
+        width: 25%;
+        float: left;
+    }
+    .fixed-table-body .card-view .title{
+        font-weight: bold;
+    }
+    .card-view .title{
+        min-width: 30%;
+    }
+</style>
+
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+
+        <form id="editMatch">
+            <input id="fID" name="fId" th:value="${fId}" type="hidden">
+            <input id="mMainId" name="mMainId" th:value="${mMainId}" type="hidden">
+            <input id="bMatchNo" name="bMatchNo"  type="hidden">
+        </form>
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" ></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+</body>
+<script th:inline="javascript">
+    var prefix =  "/Basic/Main";
+    var matchArr = [];
+    $(function() {
+        var options = {
+            uniqueId: "f_id",
+            url: prefix+"/selectMatchNo",
+            sortName: "f_name",
+            sortOrder: "asc",
+            pagination: true,                   //是否显示分页（*）
+            modalName: "部件",
+            search: true,
+            clickToSelect:true,
+            showExport: false,
+            showToggle:false,
+            striped:false,
+            showRefresh:false,
+            showColumns:false,
+            queryParams:function (params) {
+                return {
+                    "f_name":[[${type}]],
+                    "model_id":[[${bModelName}]],
+                    "prod_classify_id":[[${prod_cate}]],
+                    pageSize: params.limit,
+                    pageNum: params.offset / params.limit + 1,
+                    searchValue: params.search,
+                    orderByColumn: params.sort,
+                    isAsc: params.order
+                }
+            },
+            onCheckAll: function (rows) {
+                matchArr=[];
+                $.each(rows,function (i,row) {
+                    matchArr.push(row.match_no)
+                });
+                setInput()
+            },
+            onUncheckAll: function (rows) {
+                matchArr=[];
+                setInput()
+            },
+            onCheck: function (row) {
+                matchArr.push(row.match_no);
+                setInput()
+            },
+            onUncheck:function(row){
+                matchArr.splice(matchArr.indexOf(row.match_no),1);
+                setInput()
+            },
+            columns: [
+                {
+                    checkbox: true,
+                },
+                {
+                    field: 'match_no',
+                    title: '匹配号',
+                    // halign:"center"
+                },
+            ]
+        };
+        $.table.init(options);
+        if ($.common.isEmpty($("#fID").val())){
+            console.log($("#fID").val());
+            $("#fID").val(guid());
+        }
+    });
+
+    function getText(string,value) {
+        var str;
+        str = string.replace(/></g, ",").split(",");
+        for (var i=0;i<str.length;i++){
+            var ret =  str[i];
+            var val = ret.substring(ret.indexOf('\'')+1,ret.indexOf('\'',ret.indexOf('\'')+1));
+            if (val==value){
+                return ret.substring(ret.indexOf('>')+1,ret.indexOf('<',ret.indexOf('>')))
+            }
+        }
+    }
+
+    function setInput( ) {
+        $("#bMatchNo").val(matchArr.join(","));
+    }
+
+    $('#bootstrap-table').on('load-success.bs.table',function(data){
+        $('#bootstrap-table').bootstrapTable("checkBy",{field: 'match_no', values:[[${bMatchNo}]].split(",")});
+    });
+
+    function submitHandler() {
+            $.operate.save("/Mould/Archives/save", $('#editMatch').serialize());
+    }
+</script>
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_bootstrap.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:06 GMT -->
+</html>

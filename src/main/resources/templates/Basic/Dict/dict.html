@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<style>
+    tr[pid*="row_id"]{
+        background-color: #ececec; !important;
+    }
+</style>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="query-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            字典名称：
+                            <input type="text" name="fLable" placeholder="字典名称">
+                        </li>
+                        <li>
+                            字典类型：
+                            <select class="selectpicker" data-live-search="true" tabindex="-98" name="fPid">
+                                <option value="">请选择类型</option>
+                                <%=CommonUtils.getDictOption()%>
+                            </select>
+                        </li>
+                        <li>
+                            <button class="btn btn-primary " type="button" onclick="$.treeTable.search()"><i class="fa fa-check"></i>&nbsp;搜索</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-danger " type="button"  onclick="$.form.reset()"><i class="fa fa-adjust"></i>&nbsp;重置</button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <!-- Panel Other -->
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a type="button" class="btn btn-outline btn-default" id="addData" onclick="$.operate.add(10)"><i class="glyphicon glyphicon-plus" aria-hidden="true"></i></a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-tree-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var prefix = "/Basic/Dict";
+    $(function () {
+        var options = {
+            code: "fId",
+            parentCode: "fPid",
+            uniqueId: "fId",
+            url: prefix + "/list",
+            createUrl: prefix + "/add/{id}",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove/{id}",
+            modalName: "字典",
+            expandAll:false,
+            expandFirst:false,
+            expandColumn:0,
+            columns: [
+                {
+                    field: 'fLable',
+                    title: '字典名称',
+                    align: 'center',
+                },
+                {
+                    field: 'fValue',
+                    title: '字典键值',
+                    align: 'left',
+                },
+                {
+                    field: 'status',
+                    title: '状态',
+                    align: 'left',
+                    formatter:function (value, row, index) {
+                        return value?"<span class=\"badge badge-success\">启用</span>":"<span class=\"badge btn-warning\">停用</span>"
+                    }
+                },
+                {
+                    field: 'editUser',
+                    title: '最后编辑人',
+                    align: 'left',
+                },
+                {
+                    field: 'editTime',
+                    title: '最后编辑时间',
+                    align: 'left',
+                    sortable: true,
+                    formatter:function (value, row, index) {
+                        return $.TimeTool.timestampTime(value,6)
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'left',
+                    formatter: function (value, row, index) {
+                        var actions = [];
+                        if (!$.common.isNotEmpty(row.fPid)) {
+                            actions.push('<a class="btn btn-info  btn-xs " href="#" onclick="$.operate.add(\'' + row.fId + '\')"><i class="fa fa-plus">新增</i></a> ');
+                            // actions.push('<a class="btn btn-danger btn-xs " href="#" onclick="remove(\'' + row.fId + '\')"><i class="fa fa-remove">删除</i></a>');
+                        } else {
+                            actions.push('<a class="btn btn-success btn-xs " href="#" onclick="$.operate.edit(\'' + row.fId + '\')"><i class="fa fa-edit">编辑</i></a> ');
+                            actions.push('<a class="btn btn-danger btn-xs " href="#" onclick="remove(\'' + row.fId + '\')"><i class="fa fa-remove">删除</i></a>');
+                        }
+                        return actions.join('');
+                    }
+                }
+            ]
+        };
+        $.treeTable.init(options);
+    });
+
+    function remove(id) {
+        $.modal.confirm("确定删除该条" + $.table._option.modalName + "信息吗？", function () {
+            $.ajax({
+                type: 'post',
+                url: prefix + "/remove/" + id,
+                success: function (result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.modal.msgSuccess(result.msg);
+                        $.treeTable.refresh();
+                    } else {
+                        $.modal.msgError(result.msg);
+                    }
+                }
+            });
+        });
+    }
+</script>
+</body>
+</html>

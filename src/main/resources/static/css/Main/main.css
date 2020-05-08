@@ -1,0 +1,17 @@
+#commentForm .col-sm-4{
+    padding-left: 0;
+    padding-right: 0;
+}
+
+footer {
+    height: 40px;
+    line-height: 40px;
+    border-top: 1px solid #ddd;
+    text-align: center;
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 999;
+}

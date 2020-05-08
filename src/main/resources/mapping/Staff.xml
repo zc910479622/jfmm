@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.IStaffDao" >
+    <resultMap id="ResultBase" type="com.jinfei.jfmm.model.Staff">
+        <result property="f_id" column="f_id" jdbcType="VARCHAR"/>
+        <result property="f_name" column="f_name" jdbcType="VARCHAR"/>
+        <result property="f_no" column="f_no" jdbcType="VARCHAR"/>
+        <result property="id_no" column="id_no" jdbcType="VARCHAR"/>
+        <result property="f_post" column="f_post" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <select id="selectAll" resultMap="ResultBase" parameterType="com.jinfei.jfmm.model.Staff">
+        select * from a_staff
+        <where>
+            <trim suffixOverrides="and" prefixOverrides="and">
+                <if test="f_id != null and f_id != ''">
+                    f_id = #{f_id,jdbcType=VARCHAR} and
+                </if>
+                <if test="f_name != null and f_name != ''">
+                    f_name like  "%"#{f_name,jdbcType=VARCHAR}"%" and
+                </if>
+                <if test="f_no != null and f_no != ''">
+                    f_no like "%"#{f_no,jdbcType=VARCHAR}"%" and
+                </if>
+                <if test="id_no != null and id_no != ''">
+                    id_no like "%"#{id_no,jdbcType=VARCHAR}"%" and
+                </if>
+                <if test="f_post != null and f_post != ''">
+                    f_post = #{f_post,jdbcType=VARCHAR}
+                </if>
+            </trim>
+        </where>
+        <if test="orderByColumn!=null">
+            order by #{orderByColumn} #{isAsc}
+        </if>
+    </select>
+
+    <insert id="add" parameterType="com.jinfei.jfmm.model.Staff">
+        insert into a_staff
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="f_id != null">
+                f_id,
+            </if>
+            <if test="f_name != null">
+                f_name,
+            </if>
+            <if test="f_no != null">
+                f_no,
+            </if>
+            <if test="id_no != null">
+                id_no,
+            </if>
+            <if test="f_post != null">
+                f_post
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="f_id != null">
+                #{f_id,jdbcType=VARCHAR},
+            </if>
+            <if test="f_name != null">
+                #{f_name,jdbcType=VARCHAR},
+            </if>
+            <if test="f_no != null">
+                #{f_no,jdbcType=VARCHAR},
+            </if>
+            <if test="id_no != null">
+                 #{id_no,jdbcType=VARCHAR},
+            </if>
+            <if test="f_post != null">
+                #{f_post,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="edit" parameterType="com.jinfei.jfmm.model.Staff">
+        update a_staff
+        <set>
+            <if test="f_name != null">
+                f_name = #{f_name,jdbcType=VARCHAR},
+            </if>
+            <if test="f_no != null">
+                f_no = #{f_no,jdbcType=VARCHAR},
+            </if>
+            <if test="id_no != null">
+                id_no = #{id_no,jdbcType=VARCHAR},
+            </if>
+            <if test="f_post != null">
+                f_post = #{f_post,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where f_id = #{f_id,jdbcType=VARCHAR}
+    </update>
+    <delete id="remove" parameterType="java.util.ArrayList">
+        delete from a_staff where f_id in
+        <foreach item="item" collection="array" separator="," open="(" close=")" index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+</mapper>

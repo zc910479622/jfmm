@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<style>
+    .select-table {
+        padding-bottom: 0px;
+    }
+
+    #form-config-MainAdd .col-sm-8, #form-config-DetlAdd .col-sm-8, #form-config-DetlList .col-sm-8 {
+        padding-left: 0px;
+    }
+
+    #form-config-MainAdd .col-sm-4, #form-config-DetlAdd .col-sm-4, #form-config-DetlList .col-sm-4 {
+        padding-right: 0px;
+    }
+
+    #form-config-MainAdd .col-sm-3, #form-config-DetlAdd .col-sm-3, #form-config-DetlList .col-sm-3 {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .help-block {
+        display: block;
+        position: absolute;
+        z-index: 99;
+        margin-top: 0px;
+    }
+
+    .ibox-content {
+        padding-top: 10px;
+    }
+
+    .has-feedback .form-control {
+        padding-right: 0px;
+    }
+
+    .btn-default.active, .btn-default:active, .open > .dropdown-toggle.btn-default {
+        background-color: darkgray;
+    }
+</style>
+<body>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="select-table table-striped col-sm-12" id="form-config-MainAdd" name="form-config-add">
+        <p style="font-size: 18px; border-bottom: 1px solid gainsboro;padding-top: 10px" class="col-sm-12">流转单信息</p>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">验收单号：</label>
+            <div class="col-sm-8">
+                <input id="bill_no" name="bill_no" class="form-control" type="text" placeholder="流转单号" readonly>
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">单据类型：</label>
+            <div class="col-sm-8">
+                <!--<select id="f_type" name="f_type" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('LZ_TYPE')}">
+                    <option value="">请选择类型</option>
+                    <option th:each="dict : ${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                </select>-->
+                <input id="f_type" class="form-control" type="text" placeholder="单据类型" readonly>
+                <input type="hidden" value="6" name="f_type">
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">发起人：</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="init_man_id" placeholder="发起人" readonly/>
+                <input id="man_id" type="hidden" name="init_man_id">
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">发起时间：</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="init_time" placeholder="发起时间" name="init_time" readonly/>
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">转出部门：</label>
+            <div class="col-sm-8">
+                <input type="text" id="out_org_name" name="a" onclick="selectDeptTreeOut()" placeholder="转出部门"
+                       class="form-control" readonly>
+                <input type="hidden" class="reset-input" name="out_org_id" id="out_org_id">
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">转出人：</label>
+            <div class="col-sm-8">
+                <select id="out_man_id" name="out_man_id" class="selectpicker form-control" style="width: 100%"
+                        data-live-search="true" tabindex="-98" th:with="type=${@staff.getStaffList()}">
+                    <option value="">请选择类型</option>
+                    <option th:each="staff:${type}" th:text="${staff.f_name}" th:value="${staff.f_id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">实际转出时间：</label>
+            <div class="col-sm-8">
+                <input type="text" class="time-input checkDate form-control" id="out_time" placeholder="实际转出时间"
+                       name="out_time"/>
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">计划转入部门：</label>
+            <div class="col-sm-8">
+                <input type="text" id="in_org_name" value="" onclick="selectDeptTreeIn()" placeholder="计划转入部门"
+                       class="form-control" readonly>
+                <input type="hidden" class="reset-input" name="in_org_id" id="in_org_id">
+            </div>
+        </div>
+        <input name="is_process" id="is_process" type="hidden">
+    </form>
+
+    <div class="select-table col-sm-12">
+        <form class="table-striped col-sm-12 " id="form-config-DetlAdd" name="form-config-add" style="clear: both">
+            <p style="font-size: 18px; border-bottom: 1px solid gainsboro;padding-top: 10px" class="col-sm-12">部件列表</p>
+            <div class="row col-sm-12">
+                <div class="form-group col-sm-3">
+                    <label class="col-sm-4 control-label">流转方式：</label>
+                    <div class="btn-group col-sm-8" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="isComplete" value="0">部件流转
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="radio" name="isComplete" value="1">整模流转
+                        </label>
+                    </div>
+                </div>
+                <a type="button" class="btn btn-outline btn-default" id="addData" onclick="addData()"
+                   style="float: right;"><i
+                        class="glyphicon glyphicon-plus" aria-hidden="true"></i></a>
+            </div>
+            <div id="LZb_main">
+                <div class="row  col-sm-12">
+                    <input type="hidden" id="f_name" name="f_name">
+                    <input type="hidden" id="part_id" name="part_id">
+                    <input type="hidden" id="f_no" name="f_no">
+                    <input type="hidden" id="mmd_name" name="mmd_name">
+                    <div class="form-group col-sm-3">
+                        <label class="col-sm-4 control-label">部件：</label>
+                        <div class="col-sm-8">
+                            <input id="match_no" name="match_no" class="form-control treeview-input"
+                                   onclick="selectMain()"
+                                   type="text" readonly="true" value="">
+                        </div>
+                    </div>
+                    <!--<div class="form-group col-sm-3">-->
+                    <!--<label class="col-sm-4 control-label">成套序号：</label>-->
+                    <!--<div class="col-sm-8">-->
+                    <!--<input id="order_no" name="order_no" class="form-control" type="text" placeholder="流转单号">-->
+                    <!--</div>-->
+                    <!--</div>-->
+                </div>
+            </div>
+        </form>
+        <form class="table-striped col-sm-12 " id="form-config-DetlList" name="form-config-DetlList"
+              style="clear: both">
+            <div id="LZm_main" disabled hidden>
+                <div class="row col-sm-12">
+                    <div class="form-group col-sm-3">
+                        <label class="col-sm-4 control-label">模具编号：</label>
+                        <div class="col-sm-8">
+                            <input id="model" onclick="selectMatchNo()" class="form-control" type="text"
+                                   placeholder="模具编号" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div id="DetlLsit" class="row col-sm-12"></div>
+            </div>
+        </form>
+        <div class="col-sm-12 table-striped" style="height: 37%">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var seatList = [[${@seat.getSeatList()}]];
+    var orgList = [[${@dept.deptList()}]];
+    var parts_cate = [[${@dict.getType('parts_cate')}]]
+    $("#f_type").val("量产验收单");
+    $("#is_process").val(1);
+    var prefix = "/process/LCYS";
+    var isComplete = true;
+    var mould_id;
+    var isMould = false;
+    var classify = '';
+    var comp_parts = [];
+
+    $("#init_time").val(formatterDate(null, true));
+    $("#bill_no").val("MJ" + formatterDate(null, false));
+    $("#init_man_id").val([[${user.userName}]]);
+    $("#man_id").val([[${user.userId}]]);
+
+    $('input[type=radio][name=isComplete]').change(function () {
+        if (this.value == '0') {
+            document.getElementById("form-config-DetlList").reset();
+            $("#DetlLsit").html('');
+            isComplete = true;
+            $("#LZb_main").attr("disabled", false);
+            $("#LZb_main").attr("hidden", false);
+            $("#LZm_main").attr("disabled", true);
+            $("#LZm_main").attr("hidden", true);
+        } else if (this.value == '1') {
+            document.getElementById("form-config-DetlAdd").reset();
+            isComplete = false;
+            $("#LZm_main").attr("disabled", false);
+            $("#LZm_main").attr("hidden", false);
+            $("#LZb_main").attr("disabled", true);
+            $("#LZb_main").attr("hidden", true);
+        }
+    });
+
+    $(function () {
+
+        var options = {
+            uniqueId: "f_id",
+            // data:data,
+            // url: prefix+"/selectAll",
+            // createUrl: prefix + "/add.html",
+            // updateUrl: prefix + "/edit/{id}",
+            // removeUrl: prefix + "/remove",
+            // exportUrl: prefix + "/export",
+            sortName: "match_no",
+            sortOrder: "asc",
+            pagination: true,               //是否显示分页（*）
+            modalName: "部件型号",
+            search: false,
+            showExport: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            pageSize: 10, //每页显示的记录数
+            columns: [
+                // {
+                //     checkbox: false
+                // },
+                {
+                    field: 'f_name',
+                    title: '部件名称',
+                    // halign:"center"
+                },
+                {
+                    field: 'match_no',
+                    title: '部件匹配号',
+                    align: "center",
+                    // formatter:function (value, row, index) {
+                    //     return value;
+                    // }
+                },
+                // {
+                //     field: 'order_no',
+                //     title: '成套序号',
+                //     align:"center",
+                //     formatter:function (value, row, index) {
+                //         return value==0?"":value;
+                //     }
+                // },
+                {
+                    field: 'seat_id',
+                    title: '所在地',
+                    // halign:"center"
+                    formatter: function (value, row, index) {
+                        var seats = [];
+                        var orgs = [];
+                        for (var i = 0; i < seatList.length; i++) {
+                            seats.push(seatList[i].fId);
+                        }
+                        for (var j = 0; j < orgList.length; j++) {
+                            orgs.push(orgList[j].fId);
+                        }
+                        if (seats.indexOf(value) != -1) {
+                            for (var i = 0; i < seatList.length; i++) {
+                                if (seatList[i].fId == value) {
+                                    return seatList[i].fName;
+                                }
+                            }
+                        } else if (orgs.indexOf(value) != -1) {
+                            for (var j = 0; j < orgList.length; j++) {
+                                if (orgList[j].fId == value) {
+                                    return orgList[j].fName;
+                                }
+                            }
+                        }
+                        return "";
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        if (row.fId != 1) {
+                            var actions = [];
+                            actions.push('<a class="btn btn-danger btn-xs" onclick="remove(\'' + index + '\')"><i class="fa fa-remove">删除</i></a>');
+                            return actions.join('');
+                        } else {
+                            return "";
+                        }
+                    }
+                },
+            ]
+        };
+        $.table.init(options);
+        $("#bootstrap-table").bootstrapTable("load", data);
+
+        $("#form-config-MainAdd").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                out_man_id: {
+                    message: '',
+                    validators: {
+                        notEmpty: {
+                            message: '请选择转出人'
+                        }
+                    }
+                },
+                f_type: {
+                    message: '',
+                    validators: {
+                        notEmpty: {
+                            message: '流转类型不能为空'
+                        }
+                    }
+                },
+                out_time: {
+                    message: '',
+                    trigger: "change",
+                    validators: {
+                        notEmpty: {
+                            message: '实际转出时间不能为空'
+                        }
+                    }
+                },
+                out_org_name: {
+                    message: '',
+                    validators: {
+                        notEmpty: {
+                            message: '转出部门不能为空'
+                        }
+                    }
+                },
+                in_org_name: {
+                    message: '',
+                    validators: {
+                        notEmpty: {
+                            message: '计划转入部门不能为空'
+                        }
+                    }
+                }
+            }
+        })
+        formValidator();
+    })
+
+    function formValidator() {
+        $("#form-config-DetlAdd").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                match_no: {
+                    message: '部件验证失败',
+                    trigger: 'live',
+                    validators: {
+                        notEmpty: {
+                            message: '部件不能为空'
+                        }
+                    }
+                },
+                // order_no: {
+                //     message: '成套序号验证失败',
+                //     validators: {
+                //         notEmpty: {
+                //             message: '成套序号不能为空'
+                //         }
+                //     }
+                // }
+            }
+        })
+    }
+
+    var data = new Array();
+
+    function remove(index) {
+        data.splice(index, 1);
+        $("#bootstrap-table").bootstrapTable("load", data);
+    }
+
+    function getText(string, value) {
+        var str = string.replace(/></g, ",").split(",");
+        for (var i = 0; i < str.length; i++) {
+            var ret = str[i];
+            var val = ret.substring(ret.indexOf('\'') + 1, ret.indexOf('\'', ret.indexOf('\'') + 1));
+            if (val == value) {
+                return ret.substring(ret.indexOf('>') + 1, ret.indexOf('<', ret.indexOf('>')))
+            }
+        }
+    }
+
+    function formatterDate(time, bool) {
+        var date = new Date(time != null ? time : new Date());
+        var str = "";
+        if (bool) {
+            str = date.getFullYear() + "-" + jl(date.getMonth() + 1) + "-" + jl(date.getDate()) + " " + jl(date.getHours()) + ":" + jl(date.getMinutes()) + ":" + jl(date.getSeconds());
+        } else {
+            str = date.getFullYear() + "" + jl(date.getMonth() + 1) + "" + jl(date.getDate()) + "" + jl(date.getHours()) + "" + jl(date.getMinutes()) + "" + jl(date.getSeconds());
+        }
+        return str;
+    }
+
+    function jl(value) {
+        if (value.toString().length <= 1) {
+            return "0" + value;
+        } else {
+            return value;
+        }
+    }
+
+    function addData() {
+        if (isComplete) {
+            if ($("#form-config-DetlAdd").data("bootstrapValidator").isValid()) {
+                data.push($("#form-config-DetlAdd").serializeObject())
+                document.getElementById("form-config-DetlAdd").reset();
+                $("#form-config-DetlAdd").data('bootstrapValidator').destroy();
+                $('#form-config-DetlAdd').data('bootstrapValidator', null);
+            }
+        } else {
+            $(comp_parts).each(function (i, v) {
+                var comp_part = $("#" + v + "_form").serializeObject();
+                if (comp_part.part_id != '') {
+                    data.push(comp_part);
+                }
+                document.getElementById(v + "_form").reset();
+            })
+        }
+        $("#bootstrap-table").bootstrapTable("load", data);
+        formValidator();
+    }
+
+    function submitHandler() {
+        var bootstrapValidatorMain = $("#form-config-MainAdd").data("bootstrapValidator");
+        bootstrapValidatorMain.validate();
+        if (bootstrapValidatorMain.isValid()) {
+            if (data.length > 0) {
+                $.operate.save(prefix + "/add", {
+                    imain: JSON.stringify($('#form-config-MainAdd').serializeObject()),
+                    detls: JSON.stringify(data)
+                });
+            } else {
+                $.modal.alertError("请添加部件");
+            }
+        }
+    }
+
+    //将form表单内容封装味对象
+    $.fn.serializeObject = function () {
+        var o = {};
+        var a = this.serializeArray();
+        $.each(a, function () {
+            if (o[this.name]) {
+                if (!o[this.name].push) {
+                    o[this.name] = [o[this.name]];
+                }
+                o[this.name].push(this.value || '');
+            } else {
+                o[this.name] = this.value || '';
+            }
+        });
+        return o;
+    };
+
+    function selectDeptTreeOut() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Dept/selectDeptTree/" + ($("#out_org_id").val() ? $("#out_org_id").val() : "0"),
+            callBack: doSubmitOut
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmitOut(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        $("#out_org_id").val(body.find('#treeId').val());
+        $("#out_org_name").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+
+    function selectDeptTreeIn() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Dept/selectDeptTree/" + ($("#in_org_id").val() ? $("#in_org_id").val() : "0"),
+            callBack: doSubmitIn
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmitIn(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        if (body.find('#treeName').val().indexOf("模具中心")!=-1){
+            $("#in_org_id").val(body.find('#treeId').val());
+            $("#in_org_name").val(body.find('#treeName').val());
+            layer.close(index);
+        }else {
+            $.modal.msgWarning("请选择模具中心");
+        }
+    }
+
+    function selectWareTree() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Ware/selectWareTree/" + ($("#fPid").val() ? $("#fPid").val() : "b6030e20-2784-11ea-a35c-00505689454c") + "," + $("#type").val(),
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmit(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        if (body.find('#treeType').val() != 4 && body.find('#treeType').val() != "") {
+            $.modal.msgError("请选择货位!")
+            return;
+        }
+        $("#seat_id").val(body.find('#treeId').val());
+        $("#seat_name").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+
+    function selectMain(boolen, element) {
+        isMould = boolen;
+        classify = element == null ? null : element.id;
+        var url = "/Pop/popTz";
+        if (boolen) {
+            url += "?mould_id=" + mould_id + "&classify_no=" + element.id;
+        }
+        var options = {
+            title: '部件匹配号选择',
+            width: "1150",
+            url: url,
+            callBack: doSubmitMain
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmitMain(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        if ($.common.isEmpty(body.find('#match_no').val())) {
+            $.modal.msgError("请选择部件!")
+            return
+        }
+        var f_name = body.find('#f_name').val()
+        var part_id = body.find('#part_id').val()
+        var match_no = body.find('#match_no').val()
+        var f_no = body.find('#f_no').val()
+        var mmd_name = body.find('#mmd_name').val()
+        if (isMould) {
+            $("#" + classify).val(match_no);
+            $("#" + classify + "_f_name").val(f_name);
+            $("#" + classify + "_part_id").val(part_id);
+            $("#" + classify + "_f_no").val(f_no);
+            $("#" + classify + "_mmd_name").val(mmd_name);
+        } else {
+            $("#f_name").val(f_name);
+            $("#part_id").val(part_id);
+            $("#match_no").val(match_no);
+            $("#f_no").val(f_no);
+            $("#mmd_name").val(mmd_name);
+        }
+        layer.close(index);
+        $("#form-config-DetlAdd").data("bootstrapValidator").validate();
+    }
+
+    function selectMatchNo() {
+        var options = {
+            title: '匹配号选择',
+            width: "1150",
+            url: "/Pop/popMMain",
+            callBack: doSubmitMatchNo
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmitMatchNo(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        $("#model").val(body.find('#fNo').val());
+        // $("#prop_model_id").val(body.find('#fName').val());
+        mould_id = body.find('#fId').val();
+        var str = "<form></form>";
+        getBMainByMouldID(body.find('#fId').val());
+        $.ajax({
+            url: "/Mould/Main/getMMainById",
+            type: "post",
+            dataType: "json",
+            data: {fId: body.find('#fId').val()},
+            success: function (data) {
+                comp_parts = data.comp_parts.split(",");
+                $(comp_parts).each(function (i, v) {
+                    str += '<form id="' + v + '_form">' +
+                        '<div class="form-group col-sm-3">' +
+                        '                        <label class="col-sm-4 control-label">' + $.table.selectDictLabel(parts_cate, v) + '：</label>' +
+                        '                        <div class="col-sm-8">' +
+                        '                            <input id="' + v + '" name="match_no" class="form-control treeview-input" onclick="selectMain(true,this)"' +
+                        '                                   type="text" readonly="true" value="">' +
+                        '                               <input type="hidden" id="' + v + '_f_name" name="f_name">' +
+                        '                               <input type="hidden" id="' + v + '_part_id" name="part_id">' +
+                        '                               <input type="hidden" id="' + v + '_f_no" name="f_no">' +
+                        '                               <input type="hidden" id="' + v + '_mmd_name" name="mmd_name">' +
+                        '                        </div>' +
+                        '                    </div>' +
+                        '</form>';
+
+                })
+                $("#DetlLsit").html(str);
+            }
+        })
+        layer.close(index);
+    }
+
+    function getBMainByMouldID(mouldID) {
+        $.ajax({
+            url: "/Basic/Main/selectTZByMouldId",
+            type: "post",
+            dataType: "json",
+            data: {mouldID: mouldID},
+            success: function (dataArr) {
+                if (dataArr.length > 0) {
+                    var d =
+                        $(dataArr).each(function (i, v) {
+                            data.push(detl(v.f_name, v.f_id, v.match_no, v.mmd_name));
+                        })
+                    $("#bootstrap-table").bootstrapTable("load", data);
+                } else {
+                    $.modal.msgError("所选模具编号无匹配部件")
+                }
+            }
+        })
+    }
+
+    function detl(f_name, part_id, match_no, mmd_name) {
+        var detl = new Object();
+        detl.f_name = f_name;
+        detl.part_id = part_id;
+        detl.match_no = match_no;
+        detl.mmd_name = mmd_name;
+        return detl;
+    }
+</script>
+</body>
+</html>

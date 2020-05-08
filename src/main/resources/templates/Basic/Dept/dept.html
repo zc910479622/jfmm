@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="query-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            部门名称：<input type="text" name="fName" placeholder="部门名称">
+                        </li>
+                        <li>
+                            是否仓库：
+                            <select class="selectpicker" style="width: 100%" name="isWh" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('dept_type')}">
+                                <option value="">请选择类型</option>
+                                <option th:each="dict : ${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            上级部门:
+                            <input id="fPidName" placeholder="上级部门" onclick="selectDeptTree()" type="text" readonly="true" >
+                            <input name="fPid" id="fPid" class="reset-input" type="hidden" >
+                        </li>
+                        <li>
+                            <button class="btn btn-primary " type="button" onclick="$.treeTable.search()"><i class="fa fa-check"></i>&nbsp;搜索</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-danger " type="button" onclick="$.form.reset()"><i class="fa fa-adjust"></i>&nbsp;重置</button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <!-- Panel Other -->
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a type="button" class="btn btn-outline btn-default" id="addData" onclick="$.operate.add('b6030e20-2784-11ea-a35c-00505689454c')"><i class="glyphicon glyphicon-plus" aria-hidden="true"></i></a>
+            <a type="button" class="btn btn-outline btn-default " id="editData" onclick="$.operate.editTree()"><i class="glyphicon glyphicon-pencil" aria-hidden="true"></i></a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-tree-table" data-mobile-responsive="true">
+            </table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var prefix = "/Basic/Dept";
+    $(function () {
+        var options = {
+            code: "fId",
+            parentCode: "fPid",
+            uniqueId: "fId",
+            url: prefix+"/list",
+            createUrl: prefix + "/add/{id}",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove/{id}",
+            modalName: "部门",
+            columns: [{
+                field: 'selectItem',
+                radio: true
+            },
+                {
+                    field: 'fName',
+                    title: '部门名称',
+                    align: "left"
+                },
+                {
+                    field: 'isWh',
+                    title: '是否仓库',
+                    align: "left",
+                    formatter:function (value, row, index) {
+                        if (value==0){
+                            return "<span class=\"badge badge-danger\">&nbsp;否&nbsp;</span>"
+                        }else {
+                            return "<span class=\"badge badge-primary\">&nbsp;是&nbsp;</span>"
+                        }
+                    }
+                },
+                {
+                    field: 'fAddr',
+                    title: '地址',
+                    align: "left",
+                    // formatter: function(value, item, index) {
+                    //     return $.table.selectDictLabel(datas, item.status);
+                    // }
+                },
+                {
+                    field: 'fLng',
+                    title: '经度',
+                    align: "left",
+                    // formatter: function(value, item, index) {
+                    //     return $.table.selectDictLabel(datas, item.status);
+                    // }
+                },
+                {
+                    field: 'fLat',
+                    title: '纬度',
+                    align: "left",
+                    // formatter: function(value, item, index) {
+                    //     return $.table.selectDictLabel(datas, item.status);
+                    // }
+                },
+                {
+                    field: 'fUsable',
+                    title: '是否启用',
+                    align: "left",
+
+                    formatter: function(value, item, index) {
+                        return value?"<span class=\"badge badge-primary\">启用</span>":"<span class=\"badge badge-danger\">停用</span>"
+                    }
+                },
+                {
+                    title: '操作',
+                    align: 'left',
+                    formatter: function(value, row, index) {
+                        if (row.fId != 1) {
+                            var actions = [];
+                            actions.push('<a class="btn btn-success btn-xs " href="#" onclick="$.operate.edit(\'' + row.fId + '\')"><i class="fa fa-edit">编辑</i></a> ');
+                            actions.push('<a class="btn btn-info  btn-xs " href="#" onclick="$.operate.add(\'' + row.fId + '\')"><i class="fa fa-plus">新增</i></a> ');
+                            actions.push('<a class="btn btn-danger btn-xs " href="#" onclick="remove(\'' + row.fId + '\')"><i class="fa fa-remove">删除</i></a>');
+                            return actions.join('');
+                        } else {
+                            return "";
+                        }
+                    }
+                }]
+        };
+        $.treeTable.init(options);
+    });
+
+    function remove(id) {
+        $.modal.confirm("确定删除该条" + $.table._option.modalName + "信息吗？", function () {
+            $.ajax({
+                type: 'post',
+                url: prefix + "/remove/" + id,
+                success: function (result) {
+                    if (result.code == web_status.SUCCESS) {
+                        $.modal.msgSuccess(result.msg);
+                        $.treeTable.refresh();
+                    } else {
+                        $.modal.msgError(result.msg);
+                    }
+                }
+            });
+        });
+    }
+
+</script>
+</body>
+
+</html>

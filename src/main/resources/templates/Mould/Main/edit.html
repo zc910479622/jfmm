@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+<style>
+    .btn-default.active, .btn-default:active, .open > .dropdown-toggle.btn-default{
+        background-color: darkgray;
+    }
+</style>
+<body>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-config-add" name="form-config-add">
+        <input name="fId" id="fId" hidden th:value="${mMain.fId}">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">模具型号：</label>
+            <div class="col-sm-8">
+                <input type="text" id="modelName" th:value="${@MModel.getMouldName(mMain.modelId)}" onclick="selectMould()" class="form-control" readonly>
+                <input type="hidden" id="modelId" name="modelId" th:value="${mMain.modelId}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">模具编号：</label>
+            <div class="col-sm-8">
+                <input id="fNo" name="fNo" class="form-control" type="text" th:value="${mMain.fNo}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">铸造类型：</label>
+            <div class="col-sm-8">
+                <select id="castTypeId" name="castTypeId" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('cast_type')}">
+                    <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">组成部件：</label>
+            <div class="col-sm-8">
+                <div class="btn-group" data-toggle="buttons"  th:utext="${@dict.getPartsTypeCheckBox()}">
+                </div>
+                <input type="text" id="comp_parts" name="comp_parts" th:value="${mMain.comp_parts}" hidden >
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var prefix = "/Mould/Main";
+
+    $('input[type=checkbox]').change(function(){
+        $("#comp_parts").val($('input[type=checkbox]:checked').map(function () {
+            return this.value;
+        }).get().join(','));
+    })
+
+    $(function () {
+        var parts = [[${mMain.comp_parts}]].split(',');
+        $('input[type=checkbox]').map(function () {
+            if (parts.indexOf(this.value)<0){
+                $(this.parentNode).removeClass("active");
+                this.checked = false;
+            }
+        })
+        $("#modelId").selectpicker('val', "${mMain.modelId}");
+        $("#castTypeId").selectpicker('val', "${mMain.castTypeId}");
+        $(".selectpicker").selectpicker("refresh");
+        $("#form-config-add").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                fNo: {
+                    message: '模具编号验证失败',
+                    validators: {
+                        notEmpty: {message: '模具型号名称不能为空'},
+                        remote: {
+                            url: prefix+"/checkFNo",
+                            message: '模具编号已存在,请重新输入',
+                            delay: 1000,//ajax刷新的时间是1秒一次
+                            type: 'POST', //自定义搜索数据，默认值搜索当前input value
+                            data: function (validator) {
+                                return {
+                                    "fId": $("#fId").val(), "fNo": $("#fPid").val()
+                                };
+                            }
+                        }
+                    }
+                }
+            }
+        })
+        var bootstrapValidator = $("#form-config-add").data("bootstrapValidator");
+        bootstrapValidator.validate();
+        bootstrapValidator.isValid();
+    })
+
+    function submitHandler() {
+        var bootstrapValidator = $("#form-config-add").data("bootstrapValidator");
+        bootstrapValidator.validate();
+        if (bootstrapValidator.isValid()) {
+            $.operate.save(prefix+"/edit", $('#form-config-add').serialize());
+        }
+    }
+    function selectMould() {
+        var options = {
+            title: '模具型号选择',
+            width: "1150",
+            url: "/Pop/popMMould",
+            callBack: doSubmitMould
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmitMould(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        if ($.common.isEmpty(body.find('#modelId').val())) {
+            $.modal.msgError("请选择模具型号!")
+            return
+        }
+        $("#modelId").val(body.find('#modelId').val());
+        $("#modelName").val(body.find('#modelName').val());
+        layer.close(index);
+    }
+</script>
+</body>
+</html>

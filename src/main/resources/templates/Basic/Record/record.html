@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <!--<div class="col-sm-12 search-collapse">
+            <form id="query-form">
+                <div class="select-list">
+                    <ul>
+                        <li class="select-time">
+                            <label>时间： </label>
+                            <input type="text" class="time-input" id="startTime" placeholder="开始时间" name="startTime"/>
+                            <span>-</span>
+                            <input type="text" class="time-input" id="endTime" placeholder="结束时间" name="startTime"/>
+                        </li>
+                        <li>
+                            模块名称：
+                            <input type="text" placeholder="字典名称">
+                        </li>
+                        <li>
+                            <button class="btn btn-primary " type="button"><i class="fa fa-check"></i>&nbsp;搜索</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-danger " type="button"><i class="fa fa-adjust"></i>&nbsp;重置</button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>-->
+        <!-- Panel Other -->
+
+<!--        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">-->
+<!--            <a type="button" class="btn btn-outline btn-default btn-del" id="deleteData"-->
+<!--               onclick="$.operate.clean()"><i class="glyphicon glyphicon-trash" aria-hidden="true"></i></a>-->
+<!--        </div>-->
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var prefix = "/Basic/Record";
+    var ORG = [[${@seat.getSeatList()}]];
+    var user = [[${@user.getUserList()}]];
+    function getOrgName(org_id) {
+        var fname = "";
+        $.each(ORG,function (i, seat) {
+            if (seat.fId == org_id) {
+                fname = seat.fName
+            }
+        });
+        return fname
+    }
+
+    function getUserName(fId) {
+        var fname = "";
+        $.each(user,function (i, seat) {
+            if (seat.userId == fId) {
+                fname = seat.loginName
+            }
+        });
+        return fname
+    }
+
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            cleanUrl: prefix + "/clean",
+            sortName: "operTime",
+            sortOrder: "desc",
+            modalName: "操作日志",
+            search: false,
+            showExport: false,
+            escape: true,
+            columns: [{
+                checkbox: true
+            },
+                {
+                    field: 'matchNo',
+                    title: '匹配号',
+                },
+                {
+                    field: 'outSeatId',
+                    title: '出库',
+                    formatter: function (value, row, index) {
+                        return getOrgName(value)
+                    }
+                },
+                {
+                    field: 'inSeatId',
+                    title: '入库',
+                    formatter: function (value, row, index) {
+                        return getOrgName(value)
+                    }
+                },
+                {
+                    field: 'editUser',
+                    title: '操作人',
+                    formatter:function (value,row,index) {
+                        return getUserName(value)
+                    }
+                },
+                {
+                    field: 'editTime',
+                    title: '操作时间',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        return value.split(".")[0].replace("T"," ")
+                    }
+                }
+            ]
+        };
+        $.table.init(options);
+    });
+</script>
+</body>
+</html>

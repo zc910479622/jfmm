@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <input type="hidden" id="fId" name="fId">
+        <input type="hidden" id="fNo" name="fNo">
+        <input type="hidden" id="fName" name="fName">
+        <input type="hidden" id="modelId" name="modelId">
+        <div class="col-sm-12 search-collapse">
+            <form id="query-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            模具编号：<input type="text" name="fName" placeholder="模具编号">
+                        </li>
+                        <li>
+                            铸造类型：
+                            <select id="castTypeId" name="castTypeId" class="selectpicker" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('cast_type')}">
+                                <option value="">选择铸造类型</option>
+                                <option th:each="dict : ${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary " type="button" onclick="$.table.search()"><i class="fa fa-check"></i>&nbsp;搜索
+                            </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a class="btn btn-danger " type="button" onclick="$.form.reset()"><i class="fa fa-adjust"></i>&nbsp;重置
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <!-- Panel Other -->
+
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+</body>
+<script th:inline="javascript">
+    var prefix =  "/Mould/Main";
+    var parts_cate = [[${@dict.getType('parts_cate')}]]
+    var prod_cate = [[${@dict.getType('prod_cate')}]]
+    var cast_type = [[${@dict.getType('cast_type')}]]
+    var mould_spec = [[${@dict.getType('mould_spec')}]]
+    $(function() {
+        var options = {
+            uniqueId: "fId",
+            url: prefix+"/list",
+            sortName: "fName",
+            sortOrder: "asc",
+            modalName: "模具",
+            clickToSelect:true,
+            singleSelect:true,
+            search: false,
+            showExport: true,
+            showColumns:false,
+            showToggle:false,
+            showRefresh:false,
+            sidePagination:'server',
+            onCheckAll: function (rows) {
+                checkRow(rows);
+            },
+            onUncheckAll: function (rows) {
+                checkRow(rows)
+            },
+            onCheck: function (rows) {
+                checkRow(rows)
+            },
+            onUncheck:function(rows){
+                checkRow(rows)
+            },
+            columns: [{
+                checkbox: true
+            },
+                // {
+                //     field: 'fId',
+                //     title: '部件名称',
+                //     // halign:"center"
+                // },
+                {
+                    field: 'fNo',
+                    title: '模具编号',
+                    // halign:"center"
+                },
+                {
+                    field: 'mModel.fName',
+                    title: '模具型号',
+                    // halign:"center"
+                },
+                {
+                    field: 'castTypeId',
+                    title: '铸造类型',
+                    formatter:function (value,row,index) {
+                        return $.table.selectDictLabel(cast_type,value)
+                    }
+                },
+                {
+                    field: 'mModel.prodClassifyId',
+                    title: '产品类别',
+                    formatter:function (value,row,index) {
+                        return $.table.selectDictLabel(prod_cate,value)
+                    }
+                },
+                {
+                    field: 'mModel.specId',
+                    title: '模具规格',
+                    formatter:function (value,row,index) {
+                        return $.table.selectDictLabel(mould_spec,value)
+                    }
+                },
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function checkRow(row){
+        $("#fNo").val(row.fNo)
+        $("#fId").val(row.fId)
+        $("#fName").val(row.fName)
+        $("#modelId").val(row.modelId)
+    }
+</script>
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_bootstrap.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:06 GMT -->
+</html>

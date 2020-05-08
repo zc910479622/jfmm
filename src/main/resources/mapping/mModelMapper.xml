@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.mModelMapper">
+    <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.mModel">
+        <id column="f_id" property="fId" jdbcType="VARCHAR"/>
+        <result column="f_name" property="fName" jdbcType="VARCHAR"/>
+        <result column="prod_classify_id" property="prodClassifyId" jdbcType="VARCHAR"/>
+        <result column="prod_spec_id" property="prod_spec_id" jdbcType="VARCHAR"/>
+        <result column="spec_id" property="specId" jdbcType="VARCHAR"/>
+        <result column="cust_id" property="custId" jdbcType="VARCHAR"/>
+        <result column="comp_parts" property="comp_parts" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    f_id, f_name, prod_classify_id,prod_spec_id, spec_id, cust_id,comp_parts
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from m_model
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from m_model
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insert" parameterType="com.jinfei.jfmm.model.mModel">
+    insert into m_model (f_id, f_name, prod_classify_id, prod_spec_id
+      spec_id, cust_id,comp_parts)
+    values (#{fId,jdbcType=VARCHAR}, #{fName,jdbcType=VARCHAR}, #{prodClassifyId,jdbcType=VARCHAR}, #{prod_spec_id,jdbcType=VARCHAR},
+      #{specId,jdbcType=VARCHAR}, #{custId,jdbcType=VARCHAR}, #{comp_parts,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.jinfei.jfmm.model.mModel">
+        insert into m_model
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                f_id,
+            </if>
+            <if test="fName != null">
+                f_name,
+            </if>
+            <if test="prodClassifyId != null">
+                prod_classify_id,
+            </if>
+            <if test="prod_spec_id != null">
+                prod_spec_id,
+            </if>
+            <if test="specId != null">
+                spec_id,
+            </if>
+            <if test="custId != null">
+                cust_id,
+            </if>
+            <if test="comp_parts != null">
+                comp_parts,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                #{fId,jdbcType=VARCHAR},
+            </if>
+            <if test="fName != null">
+                #{fName,jdbcType=VARCHAR},
+            </if>
+            <if test="prodClassifyId != null">
+                #{prodClassifyId,jdbcType=VARCHAR},
+            </if>
+            <if test="prod_spec_id != null">
+                #{prod_spec_id,jdbcType=VARCHAR},
+            </if>
+            <if test="specId != null">
+                #{specId,jdbcType=VARCHAR},
+            </if>
+            <if test="custId != null">
+                #{custId,jdbcType=VARCHAR},
+            </if>
+            <if test="comp_parts != null">
+                #{comp_parts,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jinfei.jfmm.model.mModel">
+        update m_model
+        <set>
+            <if test="fName != null">
+                f_name = #{fName,jdbcType=VARCHAR},
+            </if>
+            <if test="prodClassifyId != null">
+                prod_classify_id = #{prodClassifyId,jdbcType=VARCHAR},
+            </if>
+            <if test="prod_spec_id != null">
+                prod_spec_id = #{prod_spec_id,jdbcType=VARCHAR},
+            </if>
+            <if test="specId != null">
+                spec_id = #{specId,jdbcType=VARCHAR},
+            </if>
+            <if test="custId != null">
+                cust_id = #{custId,jdbcType=VARCHAR},
+            </if>
+            <if test="comp_parts != null">
+                comp_parts = #{comp_parts,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.jinfei.jfmm.model.mModel">
+    update m_model
+    set f_name = #{fName,jdbcType=VARCHAR},
+      prod_classify_id = #{prodClassifyId,jdbcType=VARCHAR},
+      prod_spec_id = #{prod_spec_id,jdbcType=VARCHAR},
+      spec_id = #{specId,jdbcType=VARCHAR},
+      cust_id = #{custId,jdbcType=VARCHAR},
+      comp_parts = #{comp_parts,jdbcType=VARCHAR}
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </update>
+    <select id="list" resultMap="BaseResultMap" parameterType="com.jinfei.jfmm.model.mModel">
+    SELECT
+	a.*,p.f_lable AS	prodClassifyName,s.f_lable AS	specName,c.f_name AS custName
+        FROM
+	m_model a
+	LEFT JOIN ( SELECT f_value, f_lable FROM a_dict WHERE f_pid = ( SELECT f_id FROM a_dict WHERE f_value = 'prod_cate' ) ) p ON p.f_value = a.prod_classify_id
+	LEFT JOIN ( SELECT f_value, f_lable FROM a_dict WHERE f_pid = ( SELECT f_id FROM a_dict WHERE f_value = 'mould_spec' ) ) s ON s.f_value = a.spec_id
+    LEFT JOIN a_cust c ON c.f_id = a.cust_id
+	<where>
+      <if test="fName != null and fName != ''">
+        AND a.f_name like CONCAT('%',#{fName},'%')
+      </if>
+      <if test="prodClassifyId != null and prodClassifyId != ''">
+        AND a.prod_classify_id = #{prodClassifyId}
+      </if>
+      <if test="specId != null and specId != ''">
+        AND a.spec_id = #{specId}
+      </if>
+      <if test="custId != null and custId != ''">
+        AND a.cust_id = #{custId}
+      </if>
+    </where>
+  </select>
+    <delete id="removeAll" parameterType="java.util.ArrayList">
+        delete from m_model where f_id in
+        <foreach item="item" collection="array" separator="," open="(" close=")" index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+</mapper>

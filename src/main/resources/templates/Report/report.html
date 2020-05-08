@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="query-form">
+                <div class="select-list">
+                    <ul>
+                        <!--<li>
+                            <label>开模事业部： </label>
+                            <input type="text" class="" onchange="" style="display:inline-block" id="requestOrg" placeholder="开模事业部" name="requestOrg"/>
+                        </li>
+                        <li>
+                            <label>存放地： </label>
+                            <input type="text" class="" onchange="" style="display:inline-block" id="location" placeholder="存放地" name="location"/>
+                        </li>-->
+                        <li>
+                            <label>模具编号： </label>
+                            <input type="text" class="" onchange="" style="display:inline-block" id="mMainName" placeholder="模具编号" name="mMainName"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary " type="button" onclick="$.table.search()"><i class="fa fa-check"></i>&nbsp;搜索</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a class="btn btn-danger " type="button" onclick="$.form.reset()"><i class="fa fa-adjust"></i>&nbsp;重置
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <!-- Panel Other -->
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a type="button" class="btn btn-outline btn-default" id="export" title="导出报表" onclick="exportExecl()"><i
+                    class="glyphicon glyphicon-open" aria-hidden="true"></i>&nbsp;导出报表</a>
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var assets_state = [[${@dict.getType('asset_states')}]]
+    var ORG = [[${@dept.deptList()}]];
+    var seat = [[${@seat.getSeatList()}]];
+    var prefix = "/Report/report";
+    var mainId = '';
+    $(function () {
+        var options = {
+            uniqueId: "fId",
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            sortName: "fName",
+            sortOrder: "asc",
+            modalName: "模具",
+            search: false,
+            showExport: false,
+            sidePagination:true,
+            onLoadSuccess:function(data){
+                layui.use('laydate', function () {
+                    var laydate = layui.laydate;
+                    var times = $(".time-input");
+                    for (var i = 0; i < times.length; i++) {
+                        var time = times[i];
+                        laydate.render({
+                            elem: time,
+                            theme: 'molv',
+                            trigger: 'click',
+                            type: 'datetime',
+                            done: function (value, date) {
+                                if ($(time).hasClass("checkDate")){
+                                    $(time).change();
+                                }
+                                $.ajax({
+                                    cache : true,
+                                    type : "POST",
+                                    dataType:"JSON",
+                                    url : "/Mould/Main/amortizationTime",
+                                    data : {"ids": mainId,"amortizationTime":value},
+                                    async : false,
+                                    error : function(request) {
+                                        $.modal.alertError("系统错误");
+                                    },
+                                    beforeSend: function () {
+                                        $.modal.loading("正在处理中，请稍后...");
+                                    },
+                                    success : function(result) {
+                                        $.operate.ajaxSuccess(result);
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            },
+            columns: [
+                {
+                    field: 'requestOrg',
+                    title: '事业部',
+                    align:"center",
+                    formatter:function (value, row, index) {
+                        return getOrgName(value)
+                    }
+                },
+                {
+                    field: 'location',
+                    title: '存放地',
+                    align:"center",
+                    formatter:function (value, row, index) {
+                        return getOrgName(value)
+                    }
+                },
+                {
+                    field: 'mainName',
+                    title: '模具编号',
+                    align:"center"
+                },
+                {
+                    field: 'modelName',
+                    title: '模具型号',
+                    align:"center"
+                },
+                {
+                    field: 'assetsState',
+                    title: '资产状态',
+                    align:"center",
+                    formatter:function (value,row,index) {
+                        return $.table.selectDictLabel(assets_state,value);
+                    }
+                },
+                {
+                    field: 'amortization',
+                    title: '摊销',
+                    align:"center",
+                    formatter:function (value,row,index) {
+                        return '<a class="btn" onclick="fun(\''+row.mainName+'\',\''+value+'\')">'+(value?"已摊销":"未摊销")+'</a>';
+                    }
+                },
+                {
+                    field: 'amortizationTime',
+                    title: '摊销时间',
+                    align:"center",
+                    formatter:function (value,row,index) {
+                        var time = $.TimeTool.timestampTime(value,6);
+                        if (time==null){
+                            return '<input class="btn form-control time-input" onclick="setMainId(\''+row.mainName+'\')" >'
+                        }else {
+                            return '<input class="btn form-control time-input" onclick="setMainId(\''+row.mainName+'\')"  value="'+time+'">'
+                        }
+                    }
+                },
+                {
+                    field: 'BM',
+                    title: '边模',
+                    align:"center"
+                },
+                {
+                    field: 'BM_rack_position',
+                    title: '库位号',
+                    align:"center",
+                    formatter:function (value,row,index) {
+                        return getSeatName(value);
+                    }
+                },
+                {
+                    field: 'BM_part_nums',
+                    title: '数量',
+                    align:"center"
+                },
+                {
+                    field: 'MJ',
+                    title: '模架',
+                    align:"center"
+                },
+                {
+                    field: 'MJ_rack_position',
+                    title: '库位号',
+                    align:"center",
+                    formatter:function (value,row,index) {
+                        return getSeatName(value);
+                    }
+                },
+
+                {
+                    field: 'MJ_part_nums',
+                    title: '数量',
+                    align:"center"
+                },
+                {
+                    field: 'SM',
+                    title: '上模',
+                    align:"center"
+                },
+                {
+                    field: 'SM_rack_position',
+                    title: '库位号',
+                    align:"center",
+                    formatter:function (value,row,index) {
+                        return getSeatName(value);
+                    }
+                },
+                {
+                    field: 'SM_part_nums',
+                    title: '数量',
+                    align:"center"
+                },
+                {
+                    field: 'XM',
+                    title: '下模',
+                    align:"center"
+                },
+                {
+                    field: 'XM_rack_position',
+                    title: '库位号',
+                    align:"center",
+                    formatter:function (value,row,index) {
+                        return getSeatName(value);
+                    }
+                },
+                {
+                    field: 'XM_part_nums',
+                    title: '数量',
+                    align:"center"
+                },
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function exportExecl() {
+        location.href = prefix+"/execl";
+    }
+    function fun(id,value) {
+        $.modal.confirm("确定更改摊状态吗？", function () {
+            $.ajax({
+                cache : true,
+                type : "POST",
+                dataType:"JSON",
+                url : "/Mould/Main/amortization",
+                data : {"ids": id,"amortization":value},
+                async : false,
+                error : function(request) {
+                    $.modal.alertError("系统错误");
+                },
+                beforeSend: function () {
+                    $.modal.loading("正在处理中，请稍后...");
+                },
+                success : function(result) {
+                    $.operate.ajaxSuccess(result);
+                }
+            });
+        });
+    }
+
+    function getOrgName(org_id) {
+        var fname = "";
+        $.each(ORG,function (i, obj) {
+            if (obj.fId == org_id) {
+                fname = obj.fName
+            }
+        })
+        return fname
+    }
+
+    function getSeatName(seat_id) {
+        var fname = "";
+        $.each(seat,function (i, obj) {
+            if (obj.fId == seat_id) {
+                fname = obj.fName
+            }
+        })
+        return fname
+    }
+
+    function setMainId(id) {
+        mainId = id;
+    }
+</script>
+</body>
+</html>

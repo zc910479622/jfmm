@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="query-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            模具编号：<input type="text" name="mMainName" placeholder="模具名称">
+                        </li>
+                        <li>
+                            产品类别：
+                            <select id="prod_cate" name="prodCate" class="selectpicker" style="width: 100%"
+                                    data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('prod_cate')}">
+                                <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            铸造类型：
+                            <select id="castTypeId" name="castType" class="selectpicker" style="width: 100%"
+                                    data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('cast_type')}">
+                                <option value="">选择铸造类型</option>
+                                <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary " type="button" onclick="$.table.search()"><i
+                                    class="fa fa-check"></i>&nbsp;搜索
+                            </a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a class="btn btn-danger " type="button" onclick="$.form.reset()"><i
+                                    class="fa fa-adjust"></i>&nbsp;重置
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <!-- Panel Other -->
+
+
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+</body>
+<script th:inline="javascript">
+    var prefix = "/Mould/Archives";
+
+    $(function () {
+        var options = {
+            uniqueId: "mMainId",
+            url: prefix + "/matchList",
+            updateUrl: prefix + "/edit/{id}",
+            sortName: "fName",
+            sortOrder: "asc",
+            modalName: "模具匹配",
+            search: false,
+            showExport: false,
+            sidePagination:'server',
+            queryParams:function (params) {
+                return {
+                    // 传递参数查询参数
+                    prodCate:$("#prod_cate").selectpicker("val"),
+                    pageSize: params.limit,
+                    pageNum: params.offset / params.limit + 1,
+                    searchValue: params.search,
+                    orderByColumn: params.sort,
+                    isAsc: params.order
+                };
+            },
+            columns: [
+                {
+                    field: 'mMainName',
+                    title: '模具编号',
+                    width:'10%'
+                },
+                {
+                    field: 'mModelName',
+                    title: '模具型号',
+                    width:'10%'
+                },
+                [# th:each="dict : ${dict}"]
+                {
+                    field: [[${dict.fValue}]],
+                    title: [[${dict.fLable}]],
+                    formatter:function (value, row, index) {
+                        var arr = row.compParts.split(",");
+                        if (arr.indexOf([[${dict.fValue}]])!=-1){
+                            return "<input readonly type='text' class='form-control' onclick='$.operate.edit(\"[(${dict.fValue})]_"+row.[(${dict.fValue})]+"_"+row.[(${dict.fValue})]FId+"_"+row.mMainId+"_"+row.mModelName+"_"+$("#prod_cate").selectpicker("val")+"\",1200)' value='"+(row.[(${dict.fValue})]==undefined?'':row.[(${dict.fValue})])+"'  style='overflow:hidden; white-space:nowrap; text-overflow:ellipsis;'/>"
+                        }else {
+                            return "--";
+                        }
+                    }
+                },
+                 [/]
+            ]
+        };
+        $.table.init(options);
+    });
+    var inputObj = "",mMainId = "";
+</script>
+</html>

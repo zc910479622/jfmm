@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.kAreaMapper" >
+  <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.kArea" >
+    <id column="f_id" property="fId" jdbcType="VARCHAR" />
+    <result column="house_id" property="houseId" jdbcType="VARCHAR" />
+    <result column="f_name" property="fName" jdbcType="VARCHAR" />
+    <result column="is_state" property="is_state" jdbcType="BIT"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    f_id, house_id, f_name,is_state
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String" >
+    select 
+    <include refid="Base_Column_List" />
+    from k_area
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.String" >
+    delete from k_area
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.jinfei.jfmm.model.kArea" >
+    insert into k_area (f_id, house_id, f_name
+      )
+    values (#{fId,jdbcType=VARCHAR}, #{houseId,jdbcType=VARCHAR}, #{fName,jdbcType=VARCHAR}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.jinfei.jfmm.model.kArea" >
+    insert into k_area
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="fId != null" >
+        f_id,
+      </if>
+      <if test="houseId != null" >
+        house_id,
+      </if>
+      <if test="fName != null" >
+        f_name,
+      </if>
+      <if test="is_state != null" >
+        is_state,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="fId != null" >
+        #{fId,jdbcType=VARCHAR},
+      </if>
+      <if test="houseId != null" >
+        #{houseId,jdbcType=VARCHAR},
+      </if>
+      <if test="fName != null" >
+        #{fName,jdbcType=VARCHAR},
+      </if>
+      <if test="is_state != null" >
+        #{is_state,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jinfei.jfmm.model.kArea" >
+    update k_area
+    <set >
+      <if test="houseId != null" >
+        house_id = #{houseId,jdbcType=VARCHAR},
+      </if>
+      <if test="fName != null" >
+        f_name = #{fName,jdbcType=VARCHAR},
+      </if>
+      <if test="is_state != null" >
+        is_state = #{is_state,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jinfei.jfmm.model.kArea" >
+    update k_area
+    set house_id = #{houseId,jdbcType=VARCHAR},
+      f_name = #{fName,jdbcType=VARCHAR}
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </update>
+  <select id="list" resultMap="BaseResultMap">
+    select * from k_area
+  </select>
+  <select id="getOption" resultMap="BaseResultMap">
+    select * from k_area Where house_id = #{fPid}
+  </select>
+  <select id="getArea" resultMap="BaseResultMap">
+    select * from k_area
+    <if test="fId!=null and fId!= '' ">
+      Where f_id = #{fId}
+    </if>
+  </select>
+    <select id="getChildren"  resultMap="BaseResultMap">
+      select * from k_area Where house_id = #{fPid}
+      <if test="fId!=null and fId!=''">
+        AND f_id = #{fId}
+      </if>
+    </select>
+</mapper>

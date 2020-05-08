@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.jinfei.jfmm.dao.sRecordMapper">
+  <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.sRecord">
+    <id column="f_id" jdbcType="VARCHAR" property="fId" />
+    <result column="b_main_id" jdbcType="VARCHAR" property="bMainId" />
+    <result column="match_no" jdbcType="VARCHAR" property="matchNo" />
+    <result column="dept_id" jdbcType="VARCHAR" property="deptId" />
+    <result column="out_seat_id" jdbcType="VARCHAR" property="outSeatId" />
+    <result column="in_seat_id" jdbcType="VARCHAR" property="inSeatId" />
+    <result column="edit_user" jdbcType="VARCHAR" property="editUser" />
+    <result column="edit_time" jdbcType="TIMESTAMP" property="editTime" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    f_id, b_main_id, dept_id, out_seat_id, in_seat_id, edit_user, edit_time
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.String" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from s_record
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </select>
+    <select id="list"  resultMap="BaseResultMap">
+      select s_record.*,b_main.match_no from s_record
+      left JOIN b_main on s_record.b_main_id = b_main.f_id
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from s_record
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </delete>
+  <insert id="insert" parameterType="com.jinfei.jfmm.model.sRecord">
+    insert into s_record (f_id, b_main_id, dept_id, 
+      out_seat_id, in_seat_id, edit_user, 
+      edit_time)
+    values (#{fId,jdbcType=VARCHAR}, #{bMainId,jdbcType=VARCHAR}, #{deptId,jdbcType=VARCHAR}, 
+      #{outSeatId,jdbcType=VARCHAR}, #{inSeatId,jdbcType=VARCHAR}, #{editUser,jdbcType=VARCHAR}, 
+      #{editTime,jdbcType=TIMESTAMP})
+  </insert>
+  <insert id="insertSelective" parameterType="com.jinfei.jfmm.model.sRecord">
+    insert into s_record
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="fId != null">
+        f_id,
+      </if>
+      <if test="bMainId != null">
+        b_main_id,
+      </if>
+      <if test="deptId != null">
+        dept_id,
+      </if>
+      <if test="outSeatId != null">
+        out_seat_id,
+      </if>
+      <if test="inSeatId != null">
+        in_seat_id,
+      </if>
+      <if test="editUser != null">
+        edit_user,
+      </if>
+      <if test="editTime != null">
+        edit_time,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="fId != null">
+        #{fId,jdbcType=VARCHAR},
+      </if>
+      <if test="bMainId != null">
+        #{bMainId,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null">
+        #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="outSeatId != null">
+        #{outSeatId,jdbcType=VARCHAR},
+      </if>
+      <if test="inSeatId != null">
+        #{inSeatId,jdbcType=VARCHAR},
+      </if>
+      <if test="editUser != null">
+        #{editUser,jdbcType=VARCHAR},
+      </if>
+      <if test="editTime != null">
+        #{editTime,jdbcType=TIMESTAMP},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.jinfei.jfmm.model.sRecord">
+    update s_record
+    <set>
+      <if test="bMainId != null">
+        b_main_id = #{bMainId,jdbcType=VARCHAR},
+      </if>
+      <if test="deptId != null">
+        dept_id = #{deptId,jdbcType=VARCHAR},
+      </if>
+      <if test="outSeatId != null">
+        out_seat_id = #{outSeatId,jdbcType=VARCHAR},
+      </if>
+      <if test="inSeatId != null">
+        in_seat_id = #{inSeatId,jdbcType=VARCHAR},
+      </if>
+      <if test="editUser != null">
+        edit_user = #{editUser,jdbcType=VARCHAR},
+      </if>
+      <if test="editTime != null">
+        edit_time = #{editTime,jdbcType=TIMESTAMP},
+      </if>
+    </set>
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.jinfei.jfmm.model.sRecord">
+    update s_record
+    set b_main_id = #{bMainId,jdbcType=VARCHAR},
+      dept_id = #{deptId,jdbcType=VARCHAR},
+      out_seat_id = #{outSeatId,jdbcType=VARCHAR},
+      in_seat_id = #{inSeatId,jdbcType=VARCHAR},
+      edit_user = #{editUser,jdbcType=VARCHAR},
+      edit_time = #{editTime,jdbcType=TIMESTAMP}
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </update>
+</mapper>

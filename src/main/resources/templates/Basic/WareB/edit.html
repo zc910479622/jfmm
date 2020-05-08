@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<body>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal" id="form-edit" name="form-edit">
+        <input name="fId" hidden value="${mainTZ.f_id}">
+        <div class="form-group">
+            <label class="col-sm-3 control-label">变更库位：</label>
+            <div class="col-sm-8">
+                <input id="fPidName" class="form-control treeview-input" onclick="selectWareTree()" type="text" readonly="true" value="${fWare.fName}">
+                <input name="fPid" id="fPid" type="hidden" value="${mainTZ.seat}">
+            </div>
+        </div>
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+
+    $(function () {
+        $("#form-edit").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                fName: {
+                    message: '部门名称验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '部门名称不能为空'
+                        }
+                    }
+                },
+            }
+        })
+    })
+
+    var prefix = "/Basic/Ware";
+
+    function submitHandler() {
+        var bootstrapValidator = $("#form-edit").data('bootstrapValidator');
+        bootstrapValidator.validate();
+        if (bootstrapValidator.isValid()) {
+            $.operate.save(prefix + "/edit", $('#form-edit').serialize());
+        }
+    }
+
+    /*部门管理-新增-选择父部门树*/
+    function selectWareTree() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Ware/selectWareTree/" + ($("#fPid").val()?$("#fPid").val():"1")+","+$("#type").val(),
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmit(index, layero){
+        var body = layer.getChildFrame('body', index);
+        $("#fPid").val(body.find('#treeId').val());
+        $("#fPidName").val(body.find('#treeName').val());
+        $("#type").val(body.find('#treeType').val());
+        layer.close(index);
+    }
+</script>
+</body>
+</html>

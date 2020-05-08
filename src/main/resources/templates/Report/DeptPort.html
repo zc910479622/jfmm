@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <div class="col-sm-12 search-collapse">
+            <form id="query-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <label>模具编号： </label>
+                            <input type="text" class="" onchange="" style="display:inline-block" id="laydate" placeholder="模具编号" name="laydate"/>
+                        </li>
+                        <li>
+                            <label>存放地： </label>
+                            <input type="text" class="" onchange="" style="display:inline-block" id="laydate" placeholder="存放地" name="laydate"/>
+                        </li>
+                        <li>
+                            <label>开模事业部： </label>
+                            <input type="text" class="" onchange="" style="display:inline-block" id="laydate" placeholder="开模事业部" name="laydate"/>
+                        </li>
+                        <li>
+                            <a class="btn btn-primary " type="button" onclick="$.table.search()"><i class="fa fa-check"></i>&nbsp;搜索</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <a class="btn btn-danger " type="button" onclick="$.form.reset()"><i class="fa fa-adjust"></i>&nbsp;重置
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <!-- Panel Other -->
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a type="button" class="btn btn-outline btn-default" id="export" title="导出报表" onclick="exportExecl()"><i
+                    class="glyphicon glyphicon-open" aria-hidden="true"></i>按事业部</a>
+            <a type="button" class="btn btn-outline btn-default" title="导出报表" onclick="exportExecl1()"><i
+                    class="glyphicon glyphicon-open" aria-hidden="true">按模具类型</i></a>
+            <!--            <a type="button" class="btn btn-outline btn-default" id="addData" onclick="$.operate.add()"><i class="glyphicon glyphicon-plus" aria-hidden="true"></i></a>-->
+            <!--            <a type="button" class="btn btn-outline btn-default btn-edit" id="editData" onclick="$.operate.editTree()"><i class="glyphicon glyphicon-pencil" aria-hidden="true"></i></a>-->
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var prefix = "/Report/DeptPort";
+    $(function () {
+        var options = {
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            sortName: "fName",
+            sortOrder: "asc",
+            modalName: "模具",
+            search: false,
+            showExport: false,
+            paginationShowPageGo: true,
+            fixedColumns: true,
+            fixedNumber: 3,
+            columns: [
+                {
+                    field: 'fNo',
+                    title: '模具编号',
+                    formatter: function (value, row, index) {
+                        return '<a onclick="$.operate.edit(\'' + row.f_id + '\',1200,true)">' + row.mMain.fNo + '</a>';
+                    }
+                },
+                {
+                    field: 'fName',
+                    title: '模具型号',
+                    // halign:"center"
+                },
+                {
+                    field: 'fLable',
+                    title: '模具数量',
+                    // halign:"center"
+                },
+                {
+                    field: 'zczt',
+                    title: '资产状态',
+                    // halign:"center"
+                },
+                {
+                    field: 'type',
+                    title: '模具类型',
+                    // halign:"center"
+                },
+                {
+                    field: 'specName',
+                    title: '存放地点',
+                },
+                {
+                    field: 'KMSYB',
+                    title: '开模事业部',
+                },
+                {
+                    field: 'fNo',
+                    title: '模具编号',
+                    formatter: function (value, row, index) {
+                        return '<a onclick="$.operate.edit(\'' + row.f_id + '\',1200,true)">' + row.mMain.fNo + '</a>';
+                    }
+                },
+                {
+                    field: 'fName',
+                    title: '模具型号',
+                    // halign:"center"
+                },
+                {
+                    field: 'fLable',
+                    title: '模具数量',
+                    // halign:"center"
+                },
+                {
+                    field: 'zczt',
+                    title: '资产状态',
+                    // halign:"center"
+                },
+                {
+                    field: 'type',
+                    title: '模具类型',
+                    // halign:"center"
+                },
+                {
+                    field: 'specName',
+                    title: '存放地点',
+                },
+                {
+                    field: 'KMSYB',
+                    title: '开模事业部',
+                },
+                {
+                    field: 'fNo',
+                    title: '模具编号',
+                    formatter: function (value, row, index) {
+                        return '<a onclick="$.operate.edit(\'' + row.f_id + '\',1200,true)">' + row.mMain.fNo + '</a>';
+                    }
+                },
+                {
+                    field: 'fName',
+                    title: '模具型号',
+                    // halign:"center"
+                },
+                {
+                    field: 'fLable',
+                    title: '模具数量',
+                    // halign:"center"
+                },
+                {
+                    field: 'zczt',
+                    title: '资产状态',
+                    // halign:"center"
+                },
+                {
+                    field: 'type',
+                    title: '模具类型',
+                    // halign:"center"
+                },
+                {
+                    field: 'specName',
+                    title: '存放地点',
+                },
+                {
+                    field: 'KMSYB',
+                    title: '开模事业部',
+                },
+                {
+                    field: 'fNo',
+                    title: '模具编号',
+                    formatter: function (value, row, index) {
+                        return '<a onclick="$.operate.edit(\'' + row.f_id + '\',1200,true)">' + row.mMain.fNo + '</a>';
+                    }
+                },
+                {
+                    field: 'fName',
+                    title: '模具型号',
+                    // halign:"center"
+                },
+                {
+                    field: 'fLable',
+                    title: '模具数量',
+                    // halign:"center"
+                },
+                {
+                    field: 'zczt',
+                    title: '资产状态',
+                    // halign:"center"
+                },
+                {
+                    field: 'type',
+                    title: '模具类型',
+                    // halign:"center"
+                },
+                {
+                    field: 'specName',
+                    title: '存放地点',
+                },
+                {
+                    field: 'KMSYB',
+                    title: '开模事业部',
+                },
+                {
+                    field: 'fNo',
+                    title: '模具编号',
+                    formatter: function (value, row, index) {
+                        return '<a onclick="$.operate.edit(\'' + row.f_id + '\',1200,true)">' + row.mMain.fNo + '</a>';
+                    }
+                },
+                {
+                    field: 'fName',
+                    title: '模具型号',
+                    // halign:"center"
+                },
+                {
+                    field: 'fLable',
+                    title: '模具数量',
+                    // halign:"center"
+                },
+                {
+                    field: 'zczt',
+                    title: '资产状态',
+                    // halign:"center"
+                },
+                {
+                    field: 'type',
+                    title: '模具类型',
+                    // halign:"center"
+                },
+                {
+                    field: 'specName',
+                    title: '存放地点',
+                },
+                {
+                    field: 'KMSYB',
+                    title: '开模事业部',
+                },
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function exportExecl() {
+        location.href = prefix + "/execl" + $("#laydate").val()
+    }
+
+    function exportExecl1() {
+        location.href = "/Report/report/execl"
+    }
+</script>
+</body>
+</html>

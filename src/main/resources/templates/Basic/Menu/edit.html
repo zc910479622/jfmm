@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<body>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="form-horizontal m" id="form-menu-edit" th:object="${menu}">
+        <input id="menuId" name="menuId" type="hidden" th:field="*{menuId}"/>
+        <div class="form-group">
+            <label class="col-sm-3 control-label ">上级菜单：</label>
+            <div class="col-sm-8">
+                <input id="fPidName" class="form-control treeview-input" onclick="selectMenuTree()" type="text"
+                       readonly="true" th:value="${menu.parentName == null ? '无' : menu.parentName}">
+                <input name="parentId" id="fPid" type="hidden" th:value="${menu.parentId}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">菜单类型：</label>
+            <div class="col-sm-8">
+                <label class="radio-box"> <input type="radio" th:field="*{menuType}" name="menuType" value="M" /> 目录 </label>
+                <label class="radio-box"> <input type="radio" th:field="*{menuType}" name="menuType" value="C" /> 菜单 </label>
+                <label class="radio-box"> <input type="radio" th:field="*{menuType}" name="menuType" value="F" /> 按钮 </label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">菜单名称：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="menuName" id="menuName" th:field="*{menuName}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">请求地址：</label>
+            <div class="col-sm-8">
+                <input id="url" name="url" class="form-control" type="text" th:field="*{url}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">权限标识：</label>
+            <div class="col-sm-8">
+                <input id="perms" name="perms" class="form-control" type="text" th:field="*{perms}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">显示排序：</label>
+            <div class="col-sm-8">
+                <input class="form-control" type="text" name="orderNum" th:field="*{orderNum}">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">图标：</label>
+            <div class="col-sm-8">
+                <input id="icon" name="icon" class="form-control" type="text" placeholder="选择图标" th:field="*{icon}">
+                <div class="ms-parent" style="width: 100%;">
+                    <div class="icon-drop animated flipInX" style="display: none;max-height:200px;overflow-y:auto">
+                        <div data-th-include="/Basic/Menu/icon"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3 control-label">菜单状态：</label>
+            <div class="col-sm-8">
+                <input type="checkbox" id="visible" class="checkbox" data-switch-value="Large"
+                       data-on-text="显示" data-off-text="隐藏" data-off-color="danger" data-on-color="success"/>
+                <input name="visible" type="hidden" th:field="*{visible}">
+            </div>
+        </div>
+    </form>
+</div>
+
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var bootstrapValidator = "";
+    var prefix = "/Basic/Menu";
+
+    $(function () {
+        var menuType = $('input[name="menuType"]:checked').val();
+        menuVisible(menuType);
+    });
+
+    $(".checkbox").bootstrapSwitch({
+        onSwitchChange: function (event, state) {
+            //监听switch change事件，可以根据状态把相应的业务逻辑代码写在这里
+            if (state == true) {
+                $(this).parent().parent().next().val("1");
+            } else {
+                $(this).parent().parent().next().val("0");
+            }
+        }
+    })
+
+    function submitHandler() {
+        if (bootstrapValidator.isValid()) {
+            $.operate.save(prefix + "/edit", $('#form-menu-edit').serialize());
+        }
+    }
+
+    $(function () {
+        $.Switch.setSwitch("visible",[[${menu.visible}]]);
+        $("input[name='icon']").focus(function () {
+            $(".icon-drop").show();
+        });
+        $("#form-menu-edit").click(function (event) {
+            var obj = event.srcElement || event.target;
+            if (!$(obj).is("input[name='icon']")) {
+                $(".icon-drop").hide();
+            }
+        });
+        $(".icon-drop").find(".ico-list i").on("click",
+            function () {
+                $('#icon').val($(this).attr('class'));
+            });
+        $('input').on('ifChecked',
+            function (event) {
+                var menuType = $(event.target).val();
+                menuVisible(menuType);
+            });
+
+        $("#form-menu-edit").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                menuName: {
+                    message: '菜单名称验证失败',
+                    threshold: 1,//有2字符以上才发送ajax请求
+                    validators: {
+                        notEmpty: {message: '菜单名称不能为空'},
+                        remote: {
+                            url: prefix+"/checkMenuNameUnique",
+                            message: '菜单名称已存在,请重新输入',
+                            delay: 1000,//ajax刷新的时间是1秒一次
+                            type: 'POST', //自定义搜索数据，默认值搜索当前input value
+                            data: function (validator) {
+                                return {
+                                    "menuName": $("#menuName").val(), "parentId": $("#fPid").val(),"menuId":$("#menuId").val()
+                                };
+                            }
+                        }
+                    }
+                },
+                orderNum: {
+                    validators: {
+                        notEmpty: {
+                            message: '菜单排序不能为空'
+                        }
+                    }
+                }
+            }
+        })
+        bootstrapValidator = $("#form-menu-edit").data('bootstrapValidator');
+        bootstrapValidator.validate();
+        bootstrapValidator.isValid()
+    });
+
+    function menuVisible(menuType) {
+        if (menuType == "M") {
+            $("#url").parents(".form-group").hide();
+            $("#perms").parents(".form-group").hide();
+            $("#icon").parents(".form-group").show();
+            $("#visible").parents(".form-group").show();
+            $("#orderNum").parents(".form-group").show();
+        } else if (menuType == "C") {
+            $("#url").parents(".form-group").show();
+            $("#perms").parents(".form-group").show();
+            $("#icon").parents(".form-group").hide();
+            $("#visible").parents(".form-group").show();
+            $("#orderNum").parents(".form-group").show();
+        } else if (menuType == "F") {
+            $("#url").parents(".form-group").hide();
+            $("#perms").parents(".form-group").show();
+            $("#icon").parents(".form-group").hide();
+            $("#visible").parents(".form-group").hide();
+            $("#orderNum").parents(".form-group").hide();
+        }
+    }
+
+    /*部门管理-新增-选择父部门树*/
+    function selectMenuTree() {
+        var menuId = $("#fPid").val();
+        if (menuId != "0") {
+            var options = {
+                title: '部门选择',
+                width: "380",
+                url: "/Basic/Menu/selectMenuTree/" + ($("#fPid").val() ? $("#fPid").val() : "1"),
+                callBack: doSubmit
+            };
+            $.modal.openOptions(options);
+        } else {
+            $.modal.alertError("主菜单不能选择");
+        }
+    }
+
+    function doSubmit(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        $("#fPid").val(body.find('#treeId').val());
+        $("#fPidName").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+</script>
+</body>
+</html>

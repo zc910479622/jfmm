@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+
+<body class="gray-bg">
+<div class="container-div">
+    <div class="row">
+        <!--<div class="col-sm-12 search-collapse">
+            <form id="query-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            <label>产品类别： </label>
+                            <input type="text" class="" onchange="" style="display:inline-block" id="laydate"
+                                   placeholder="产品类别" name="laydate"/>
+                        </li>
+                        <li>
+                            <button class="btn btn-primary " type="button"><i class="fa fa-check"></i>&nbsp;搜索</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-danger " type="button"><i class="fa fa-adjust"></i>&nbsp;重置</button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>-->
+        <!-- Panel Other -->
+
+        <div class="btn-group-sm hidden-xs" id="toolbar" role="group">
+            <a type="button" class="btn btn-outline btn-default" id="export" title="导出报表" onclick="exportExecl()"><i
+                    class="glyphicon glyphicon-open" aria-hidden="true"></i></a>
+            <!--            <a type="button" class="btn btn-outline btn-default" id="addData" onclick="$.operate.add()"><i-->
+            <!--                    class="glyphicon glyphicon-plus" aria-hidden="true"></i></a>-->
+            <!--            <a type="button" class="btn btn-outline btn-default btn-edit" id="editData"-->
+            <!--               onclick="$.operate.editTree()"><i class="glyphicon glyphicon-pencil" aria-hidden="true"></i></a>-->
+        </div>
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var a = [[${@dict.getType('prod_cate')}]]
+    var prefix = "/Report/ProdCate";
+    $(function () {
+        var options = {
+            uniqueId: "fId",
+            url: prefix + "/list",
+            createUrl: prefix + "/add",
+            updateUrl: prefix + "/edit/{id}",
+            removeUrl: prefix + "/remove",
+            sortName: "fName",
+            sortOrder: "asc",
+            modalName: "模具",
+            search: false,
+            showExport: false,
+            columns: [
+                {
+                    field: 'prod_classify_id',
+                    title: '产品类别',
+                    // halign:"center"
+                },
+                {
+                    field: 'f_name',
+                    title: '部件类别',
+                    // halign:"center"
+                },
+                {
+                    field: 'assets_state',
+                    title: '资产类型',
+                    align: "center"
+                },
+                {
+                    field: 'location',
+                    title: '存放地址',
+                    align: "center",
+                },
+                {
+                    field: 'nums',
+                    title: '数量',
+                    align: "center",
+                    // halign:"center"
+                },
+                {
+                    field: 'cost',
+                    title: '开模费用',
+                    align: "center",
+                },
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function exportExecl() {
+        location.href = prefix + "/execl"
+    }
+</script>
+</body>
+</html>

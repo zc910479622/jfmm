@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.aOrgMapper">
+    <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.aOrg">
+        <id column="f_id" property="fId" jdbcType="VARCHAR"/>
+        <result column="f_name" property="fName" jdbcType="VARCHAR"/>
+        <result column="f_pid" property="fPid" jdbcType="VARCHAR"/>
+        <result column="is_wh" property="isWh" jdbcType="BIT"/>
+        <result column="f_addr" property="fAddr" jdbcType="VARCHAR"/>
+        <result column="f_lng" property="fLng" jdbcType="DOUBLE"/>
+        <result column="f_lat" property="fLat" jdbcType="DOUBLE"/>
+        <result column="f_usable" property="fUsable" jdbcType="BIT"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    f_id, f_name, f_pid, is_wh, f_addr, f_lng, f_lat, f_usable
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from a_org
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from a_org
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insert" parameterType="com.jinfei.jfmm.model.aOrg">
+    insert into a_org (f_id, f_name, f_pid,
+      is_wh, f_addr, f_lng, f_lat,
+      f_usable)
+    values (#{fId,jdbcType=VARCHAR}, #{fName,jdbcType=VARCHAR}, #{fPid,jdbcType=VARCHAR},
+      #{isWh,jdbcType=BIT}, #{fAddr,jdbcType=VARCHAR}, #{fLng,jdbcType=DOUBLE}, #{fLat,jdbcType=DOUBLE},
+      #{fUsable,jdbcType=BIT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.jinfei.jfmm.model.aOrg">
+        insert into a_org
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                f_id,
+            </if>
+            <if test="fName != null">
+                f_name,
+            </if>
+            <if test="fPid != null">
+                f_pid,
+            </if>
+            <if test="isWh != null">
+                is_wh,
+            </if>
+            <if test="fAddr != null">
+                f_addr,
+            </if>
+            <if test="fLng != null">
+                f_lng,
+            </if>
+            <if test="fLat != null">
+                f_lat,
+            </if>
+            <if test="fUsable != null">
+                f_usable,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                #{fId,jdbcType=VARCHAR},
+            </if>
+            <if test="fName != null">
+                #{fName,jdbcType=VARCHAR},
+            </if>
+            <if test="fPid != null">
+                #{fPid,jdbcType=VARCHAR},
+            </if>
+            <if test="isWh != null">
+                #{isWh,jdbcType=BIT},
+            </if>
+            <if test="fAddr != null">
+                #{fAddr,jdbcType=VARCHAR},
+            </if>
+            <if test="fLng != null">
+                #{fLng,jdbcType=DOUBLE},
+            </if>
+            <if test="fLat != null">
+                #{fLat,jdbcType=DOUBLE},
+            </if>
+            <if test="fUsable != null">
+                #{fUsable,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jinfei.jfmm.model.aOrg">
+        update a_org
+        <set>
+            <if test="fName != null">
+                f_name = #{fName,jdbcType=VARCHAR},
+            </if>
+            <if test="fPid != null">
+                f_pid = #{fPid,jdbcType=VARCHAR},
+            </if>
+            <if test="isWh != null">
+                is_wh = #{isWh,jdbcType=BIT},
+            </if>
+            <if test="fAddr != null">
+                f_addr = #{fAddr,jdbcType=VARCHAR},
+            </if>
+            <if test="fLng != null">
+                f_lng = #{fLng,jdbcType=DOUBLE},
+            </if>
+            <if test="fLat != null">
+                f_lat = #{fLat,jdbcType=DOUBLE},
+            </if>
+            <if test="fUsable != null">
+                f_usable = #{fUsable,jdbcType=BIT},
+            </if>
+        </set>
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.jinfei.jfmm.model.aOrg">
+    update a_org
+    set f_name = #{fName,jdbcType=VARCHAR},
+      f_pid = #{fPid,jdbcType=VARCHAR},
+      is_wh = #{isWh,jdbcType=BIT},
+      f_addr = #{fAddr,jdbcType=VARCHAR},
+      f_lng = #{fLng,jdbcType=DOUBLE},
+      f_lat = #{fLat,jdbcType=DOUBLE},
+      f_usable = #{fUsable,jdbcType=BIT}
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </update>
+    <select id="list" parameterType="com.jinfei.jfmm.model.aOrg" resultMap="BaseResultMap">
+        select
+        <include refid="Base_Column_List"/>
+        from a_org
+        <where>
+            <if test="fName != null and fName != ''">
+               AND f_name Like CONCAT('%',#{fName},'%')
+            </if>
+            <if test="fPid != null and fPid != ''">
+                AND f_pid = #{fPid,jdbcType=VARCHAR}
+            </if>
+            <if test="isWh != null and isWh != 2 and isWh != ''">
+                AND is_wh = #{isWh,jdbcType=BIT}
+            </if>
+        </where>
+    </select>
+    <select id="getWare" resultMap="BaseResultMap">
+        select f_name,f_id from a_org where is_wh = 1
+    </select>
+    <select id="getWareB" resultMap="BaseResultMap">
+        select * from a_org Where is_wh = 1
+        <if test="fId!=null and fId!= '' ">
+              AND f_id = #{fId}
+        </if>
+    </select>
+    <select id="checkFName" resultType="java.lang.Boolean">
+        select count(f_id) from a_org
+        <where>
+            <if test="fName!=null and fName!=''">
+                AND f_name = #{fName}
+            </if>
+            <if test="fPid!=null and fPid!=''">
+                AND f_pid = #{fPid}
+            </if>
+            <if test=" fId != null and fId != '' ">
+                AND f_id != #{fId}
+            </if>
+        </where>
+    </select>
+    <select id="divisionList" resultMap="BaseResultMap">
+        select * from a_org where f_name like concat('%','事业部','%')
+    </select>
+    <select id="getWareTree" resultMap="BaseResultMap">
+        select * FROM a_org WHERE FIND_IN_SET(f_id,org(#{fId}))
+    </select>
+</mapper>

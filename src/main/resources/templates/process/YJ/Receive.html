@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<style>
+    .help-block{
+        display: block;
+        position: absolute;
+        z-index: 99999;
+        margin-top: 0px;
+    }
+    .ibox-content{
+        padding-top: 10px;
+    }
+    .btn-default.active, .btn-default:active, .open > .dropdown-toggle.btn-default{
+        background-color: darkgray;
+    }
+</style>
+<head>
+    <link href="../../css/plugins/bootstrap-fileinput/css/fileinput.css" rel="stylesheet">
+</head>
+<body>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="select-table table-striped col-sm-12" id="form-config-MainAdd" name="form-config-add">
+        <div class="form-group col-sm-6" hidden>
+            <label class="col-sm-4 control-label">ID：</label>
+            <div class="col-sm-8">
+                <input id="f_id" name="f_id" type="text"/>
+            </div>
+        </div>
+        <div class="form-group col-sm-6">
+            <label class="col-sm-4 control-label">接收时间：</label>
+            <div class="col-sm-8">
+                <input type="text" class="time-input form-control" id="in_time" placeholder="接收时间" name="in_time" readonly/>
+            </div>
+        </div>
+        <div class="form-group col-sm-6">
+            <label class="col-sm-4 control-label">编辑时间：</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="rece_edit_time" placeholder="编辑时间" name="rece_edit_time" readonly/>
+            </div>
+        </div>
+        <div class="form-group col-sm-6">
+            <label class="col-sm-4 control-label">是否入库：</label>
+            <div class="btn-group col-sm-8" data-toggle="buttons">
+                <label class="btn btn-default active">
+                    <input type="radio" name="isComplete"value="0">是
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="isComplete" value="1">否
+                </label>
+            </div>
+        </div>
+        <div class="form-group col-sm-6" id="RK">
+            <label class="col-sm-4 control-label">货位：</label>
+            <div class="col-sm-8">
+                <input id="seat_name" name="seat_name" class="form-control treeview-input" onclick="selectWareTree()" type="text"
+                       readonly="true" value="">
+                <input name="seat_id" id="seat_id" type="hidden" value="">
+            </div>
+        </div>
+    </form>
+    <form enctype="multipart/form-data" class="select-table table-striped col-sm-12" >
+        <div class="container col-sm-12">
+            <label>图片上传</label>
+            <div class="file-loading">
+                <input id="file-fr" name="file" type="file" multiple>
+            </div>
+        </div>
+        <input type="hidden" id="save_return">
+    </form>
+</div>
+<div th:include="include::footer"></div>
+<script src="../../css/plugins/bootstrap-fileinput/js/fileinput.js"></script>
+<script src="../../css/plugins/bootstrap-fileinput/js/locales/zh.js"></script>
+<script>
+    var prefix = "/Basic/IMain";
+    var index = 0;
+
+    $(function(){
+        $("#rece_edit_time").val(formatterDate(null,true));
+        $("#f_id").val(getUrlPara("fId"));
+
+        $("#form-config-MainAdd").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                in_time: {
+                    message: '',
+                    validators: {
+                        notEmpty: {
+                            message: '接收时间不能为空'
+                        }
+                    }
+                },
+                seat_name: {
+                    message: '',
+                    validators: {
+                        notEmpty: {
+                            message: '仓库（库位）不能为空'
+                        }
+                    }
+                },
+            }
+        })
+    })
+
+    $("#in_time").trigger("input");
+    $("#in_time").bind("input propertychange",function () {
+        // console.log(1231231321321231);
+    });
+
+    $('input[type=radio][name=isComplete]').change(function() {
+        var str = '';
+        if (this.value == '0') {
+            str = '<label class="col-sm-4 control-label">货位：</label>\n' +
+                '            <div class="col-sm-8">\n' +
+                '                <input id="seat_name" class="form-control treeview-input" onclick="selectWareTree()" type="text"\n' +
+                '                       readonly="true" value="">\n' +
+                '                <input name="seat_id" id="seat_id" type="hidden" value="">\n' +
+                '            </div>' ;
+        } else if (this.value == '1') {
+            str = '<label class="col-sm-4 control-label">接收部门：</label>\n' +
+                '            <div class="col-sm-8">\n' +
+                '                <input id="seat_name" class="form-control treeview-input" onclick="selectDeptTreeIn()" type="text"\n' +
+                '                       readonly="true" value="">\n' +
+                '                <input name="seat_id" id="seat_id" type="hidden" value="">\n' +
+                '            </div>';
+        }
+        $("#RK").html(str);
+    });
+
+    function selectDeptTreeIn() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Dept/selectDeptTree/" + ($("#in_org_id").val() ? $("#in_org_id").val() : "0"),
+            callBack: doSubmitIn
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmitIn(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        $("#seat_id").val(body.find('#treeId').val());
+        $("#seat_name").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+
+    function selectWareTree() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Ware/selectWareTree/" + ($("#fPid").val() ? $("#fPid").val() : "1") + "," + $("#type").val(),
+            callBack: doSubmit
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmit(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        if (body.find('#treeType').val() != 4 && body.find('#treeType').val() != "") {
+            $.modal.msgError("请选择货位!")
+            return;
+        }
+        $("#seat_id").val(body.find('#treeId').val());
+        $("#seat_name").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+
+    function getUrlPara(name) {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+        var url=decodeURI(decodeURI(window.location.search))
+        var r = url.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    $(function () {
+        //0.初始化fileinput
+        var oFileInput = new FileInput();
+        oFileInput.Init("file-fr", "/SavePicture/upload");
+    });
+
+    //初始化fileinput
+    var FileInput = function () {
+        var oFile = new Object();
+
+        //初始化fileinput控件（第一次初始化）
+        oFile.Init = function(ctrlName, uploadUrl) {
+            var control = $('#' + ctrlName);
+
+            //初始化上传控件的样式
+            control.fileinput({
+                language: 'zh', //设置语言
+                uploadUrl: uploadUrl, //上传的地址
+                uploadAsync:false,
+                allowedFileExtensions: ['jpg', 'gif', 'png'],//接收的文件后缀
+                showUpload: false, //是否显示上传按钮
+                showCaption: false,//是否显示标题
+                browseClass: "btn btn-primary", //按钮样式
+                //dropZoneEnabled: false,//是否显示拖拽区域
+                //minImageWidth: 50, //图片的最小宽度
+                //minImageHeight: 50,//图片的最小高度
+                //maxImageWidth: 1000,//图片的最大宽度
+                //maxImageHeight: 1000,//图片的最大高度
+                //maxFileSize: 0,//单位为kb，如果为0表示不限制文件大小
+                //minFileCount: 0,
+                // maxFileCount: 1, //表示允许同时上传的最大文件个数
+                enctype: 'multipart/form-data',
+                validateInitialCount:true,
+                previewFileIcon: "<i class='glyphicon glyphicon-king'></i>",
+                msgFilesTooMany: "选择上传的文件数量({n}) 超过允许的最大数值{m}！",
+                layoutTemplates:{
+                    actionUpload:""
+                }
+            });
+
+            control.on("filebatchuploadsuccess", function (event, data) {
+                // var body = $("#layui-layer-iframe1",window.parent.Element)
+                parent.window.call(index);
+                // document.cookie = "img_path="+data.response.path;
+                // $("#save_return").val(data.response.path);
+                // console.log(data.response.path)
+            });
+
+            //导入文件上传完成之后的事件
+            // $("#file-fr").on("fileuploaded", function (event, data, previewId, index) {
+            //
+            //     // $("#myModal").modal("hide");
+            //     // var data = data.response.lstOrderImport;
+            //     // if (data == undefined) {
+            //     //     toastr.error('文件格式类型不正确');
+            //     //     return;
+            //     // }
+            //     //1.初始化表格
+            //     var oTable = new TableInit();
+            //     oTable.Init(data);
+            //     $("#div_startimport").show();
+            // });
+        }
+        return oFile;
+    };
+
+    function formatterDate(time,bool) {
+        var date = new Date(time!=null?time:new Date());
+        var str = "";
+        if (bool){
+            str = date.getFullYear()+"-"+jl(date.getMonth()+1)+"-"+jl(date.getDate())+" "+jl(date.getHours())+":"+jl(date.getMinutes())+":"+jl(date.getSeconds());
+        } else{
+            str = date.getFullYear()+""+jl(date.getMonth()+1)+""+jl(date.getDate())+""+jl(date.getHours())+""+jl(date.getMinutes())+""+jl(date.getSeconds());
+        }
+        return str;
+    }
+
+    function jl(value) {
+        if (value.toString().length<=1){
+            return "0"+value;
+        } else {
+            return value;
+        }
+    }
+
+    function submitHandler(value) {
+        $("#in_time").trigger("input");
+        $("#seat_name").trigger("input");
+        index = value;
+        var bootstrapValidatorMain = $("#form-config-MainAdd").data("bootstrapValidator");
+        bootstrapValidatorMain.validate();
+        if (bootstrapValidatorMain.isValid()) {
+            $("#file-fr").fileinput("upload");
+        }
+    }
+
+</script>
+</body>
+</html>

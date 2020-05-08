@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.ccgcyMapper">
+    <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.ccgcy">
+        <result column="FID" property="fid" jdbcType="VARCHAR"/>
+        <result column="MJLX" property="mjlx" jdbcType="VARCHAR"/>
+        <result column="CW" property="cw" jdbcType="VARCHAR"/>
+        <result column="MJZS" property="mjzs" jdbcType="VARCHAR"/>
+        <result column="BJLB" property="bjlb" jdbcType="VARCHAR"/>
+        <result column="ZCZT" property="zczt" jdbcType="VARCHAR"/>
+        <result column="CFD" property="cfd" jdbcType="VARCHAR"/>
+        <result column="OTHER_1" property="other1" jdbcType="VARCHAR"/>
+        <result column="TYPE" property="type" jdbcType="BIT"/>
+        <result column="Nums" property="nums" jdbcType="VARCHAR"/>
+        <result column="KMSQSYB" property="KMSQSYB" jdbcType="VARCHAR"/>
+        <association property="mMain" javaType="com.jinfei.jfmm.model.mMain">
+            <id column="f_id" property="fId" jdbcType="VARCHAR"/>
+            <result column="model_id" property="modelId" jdbcType="VARCHAR"/>
+            <result column="f_no" property="fNo" jdbcType="VARCHAR"/>
+            <result column="cast_type_id" property="castTypeId" jdbcType="VARCHAR"/>
+            <result column="comp_parts" property="comp_parts" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+    <insert id="insert" parameterType="com.jinfei.jfmm.model.ccgcy">
+    insert into ccgcy (FID, MJLX, CW, 
+      MJZS, BJLB, ZCZT, CFD, 
+      OTHER_1, TYPE)
+    values (#{fid,jdbcType=VARCHAR}, #{mjlx,jdbcType=VARCHAR}, #{cw,jdbcType=VARCHAR}, 
+      #{mjzs,jdbcType=VARCHAR}, #{bjlb,jdbcType=VARCHAR}, #{zczt,jdbcType=VARCHAR}, #{cfd,jdbcType=VARCHAR}, 
+      #{other1,jdbcType=VARCHAR}, #{type,jdbcType=BIT})
+  </insert>
+    <insert id="insertSelective" parameterType="com.jinfei.jfmm.model.ccgcy">
+        insert into ccgcy
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fid != null">
+                FID,
+            </if>
+            <if test="mjlx != null">
+                MJLX,
+            </if>
+            <if test="cw != null">
+                CW,
+            </if>
+            <if test="mjzs != null">
+                MJZS,
+            </if>
+            <if test="bjlb != null">
+                BJLB,
+            </if>
+            <if test="zczt != null">
+                ZCZT,
+            </if>
+            <if test="cfd != null">
+                CFD,
+            </if>
+            <if test="other1 != null">
+                OTHER_1,
+            </if>
+            <if test="type != null">
+                TYPE,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fid != null">
+                #{fid,jdbcType=VARCHAR},
+            </if>
+            <if test="mjlx != null">
+                #{mjlx,jdbcType=VARCHAR},
+            </if>
+            <if test="cw != null">
+                #{cw,jdbcType=VARCHAR},
+            </if>
+            <if test="mjzs != null">
+                #{mjzs,jdbcType=VARCHAR},
+            </if>
+            <if test="bjlb != null">
+                #{bjlb,jdbcType=VARCHAR},
+            </if>
+            <if test="zczt != null">
+                #{zczt,jdbcType=VARCHAR},
+            </if>
+            <if test="cfd != null">
+                #{cfd,jdbcType=VARCHAR},
+            </if>
+            <if test="other1 != null">
+                #{other1,jdbcType=VARCHAR},
+            </if>
+            <if test="type != null">
+                #{type,jdbcType=BIT},
+            </if>
+        </trim>
+    </insert>
+    <select id="callfun" resultType="java.lang.String">
+      select PROD_CCGCY(#{start},#{end}) FROM dual
+    </select>
+    <select id="list" resultMap="BaseResultMap">
+    SELECT FID,MJLX,CW,GROUP_CONCAT(BJLB) AS BJLB,ZCZT,GROUP_CONCAT(NUMS) AS Nums,CFD FROM (
+        SELECT FID,MJLX,CW,BJLB,ZCZT,COUNT(0) AS NUMS,CFD FROM `ccgcy` WHERE TYPE=0 GROUP BY FID,MJLX,CW,CFD,ZCZT,BJLB) A GROUP BY FID,MJLX,CW,CFD,ZCZT
+  </select>
+
+    <select id="listTable" resultMap="BaseResultMap">
+     SELECT FID,MJLX,CW,MJZS,BJLB,ZCZT,CFD,KMSQSYB,m_main.f_no FROM ccgcy  LEFT JOIN m_main ON ccgcy.FID = m_main.f_id
+    </select>
+
+    <select id="listDept" resultMap="BaseResultMap">
+    SELECT * FROM ccgcy
+  </select>
+</mapper>

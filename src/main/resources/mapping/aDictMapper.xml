@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.aDictMapper">
+    <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.aDict">
+        <id column="f_id" property="fId" jdbcType="VARCHAR"/>
+        <result column="f_lable" property="fLable" jdbcType="VARCHAR"/>
+        <result column="f_value" property="fValue" jdbcType="VARCHAR"/>
+        <result column="f_pid" property="fPid" jdbcType="VARCHAR"/>
+        <result column="status" property="status" jdbcType="BIT"/>
+        <result column="edit_user" property="editUser" jdbcType="VARCHAR"/>
+        <result column="edit_time" property="editTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+    f_id, f_lable, f_value, f_pid, status, edit_user, edit_time
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from a_dict
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from a_dict
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insert" parameterType="com.jinfei.jfmm.model.aDict">
+    insert into a_dict (f_id, f_lable, f_value, 
+      f_pid, status, edit_user, 
+      edit_time)
+    values (#{fId,jdbcType=VARCHAR}, #{fLable,jdbcType=VARCHAR}, #{fValue,jdbcType=VARCHAR}, 
+      #{fPid,jdbcType=VARCHAR}, #{status,jdbcType=BIT}, #{editUser,jdbcType=VARCHAR}, 
+      #{editTime,jdbcType=TIMESTAMP})
+  </insert>
+    <insert id="insertSelective" parameterType="com.jinfei.jfmm.model.aDict">
+        insert into a_dict
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                f_id,
+            </if>
+            <if test="fLable != null">
+                f_lable,
+            </if>
+            <if test="fValue != null">
+                f_value,
+            </if>
+            <if test="fPid != null">
+                f_pid,
+            </if>
+            <if test="status != null">
+                status,
+            </if>
+            <if test="editUser != null">
+                edit_user,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                #{fId,jdbcType=VARCHAR},
+            </if>
+            <if test="fLable != null">
+                #{fLable,jdbcType=VARCHAR},
+            </if>
+            <if test="fValue != null">
+                #{fValue,jdbcType=VARCHAR},
+            </if>
+            <if test="fPid != null">
+                #{fPid,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                #{status,jdbcType=BIT},
+            </if>
+            <if test="editUser != null">
+                #{editUser,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jinfei.jfmm.model.aDict">
+        update a_dict
+        <set>
+            <if test="fLable != null">
+                f_lable = #{fLable,jdbcType=VARCHAR},
+            </if>
+            <if test="fValue != null">
+                f_value = #{fValue,jdbcType=VARCHAR},
+            </if>
+            <if test="fPid != null">
+                f_pid = #{fPid,jdbcType=VARCHAR},
+            </if>
+            <if test="status != null">
+                status = #{status,jdbcType=BIT},
+            </if>
+            <if test="editUser != null">
+                edit_user = #{editUser,jdbcType=VARCHAR},
+            </if>
+            <if test="editTime != null">
+                edit_time = #{editTime,jdbcType=TIMESTAMP},
+            </if>
+        </set>
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.jinfei.jfmm.model.aDict">
+    update a_dict
+    set f_lable = #{fLable,jdbcType=VARCHAR},
+      f_value = #{fValue,jdbcType=VARCHAR},
+      f_pid = #{fPid,jdbcType=VARCHAR},
+      status = #{status,jdbcType=BIT},
+      edit_user = #{editUser,jdbcType=VARCHAR},
+      edit_time = #{editTime,jdbcType=TIMESTAMP}
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </update>
+    <select id="list" parameterType="com.jinfei.jfmm.model.aDict" resultMap="BaseResultMap">
+        select * from a_dict
+        <where>
+            <if test="fPid != null and fPid!=''">
+                AND f_pid = #{fPid,jdbcType=VARCHAR}
+                OR f_id = #{fPid,jdbcType=VARCHAR}
+            </if>
+            <if test="fLable != null and fLable!=''">
+                AND f_lable Like CONCAT('%',#{fLable},'%')
+            </if>
+        </where>
+        ORDER BY f_value
+    </select>
+    <select id="getDictType" resultMap="BaseResultMap">
+    select * from a_dict WHERE f_pid is null
+        ORDER BY f_value
+  </select>
+
+    <select id="checkFValue" resultType="java.lang.Boolean" parameterType="java.lang.String">
+        select count(f_id) from a_dict
+        <where>
+            <if test=" fValue != null and fValue != '' ">
+                and f_value = #{fValue}
+            </if>
+            <if test=" fPid != null and fPid != '' ">
+                AND f_pid = #{fPid}
+            </if>
+            <if test=" fId != null and fId != '' ">
+                AND f_id != #{fId}
+            </if>
+        </where>
+    </select>
+
+    <select id="checkFLable" resultType="java.lang.Boolean" parameterType="java.lang.String">
+        select count(f_id) from a_dict
+        <where>
+            <if test="fLable!=null and fLable!=''">
+                AND f_lable = #{fLable}
+            </if>
+            <if test="fPid!=null and fPid!=''">
+                AND f_pid = #{fPid}
+            </if>
+            <if test=" fId != null and fId != '' ">
+                AND f_id != #{fId}
+            </if>
+        </where>
+    </select>
+    <select id="getDictOption" resultMap="BaseResultMap" parameterType="java.lang.String">
+    select * from a_dict WHERE f_pid = (select f_id FROM a_dict WHERE f_value = #{fValue}) AND status = '01'
+        ORDER BY f_value
+  </select>
+</mapper>

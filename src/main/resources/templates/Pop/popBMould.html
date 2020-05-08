@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+
+<body class="gray-bg">
+
+<div class="container-div">
+    <div class="row">
+        <input id="modelId" type="hidden" value="">
+        <input id="modelName" type="hidden" value="">
+        <div class="col-sm-12 search-collapse">
+            <form id="query-form">
+                <div class="select-list">
+                    <ul>
+                        <li>
+                            部件型号名称：<input type="text" name="f_name">
+                        </li>
+                        <li>
+                            产品类别：
+                            <select id="prod_classify_id" name="prod_classify_id" class="selectpicker" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('prod_cate')}">
+                                <option value="">请选择类型</option>
+                                <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            部件类别：
+                            <select id="classify_no" name="classify_no" class="selectpicker" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('parts_cate')}">
+                                <option value="">请选择类别</option>
+                                <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            模具规格:
+                            <select id="mould_spec_id" name="mould_spec_id" class="selectpicker" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('mould_spec')}">
+                                <option value="">请选择模具规格</option>
+                                <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                            </select>
+                        </li>
+                        <li>
+                            <button class="btn btn-primary " type="button" onclick="$.table.search()"><i class="fa fa-check"></i>&nbsp;提交
+                            </button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            <button class="btn btn-danger " type="button" onclick="$.form.reset()"><i class="fa fa-adjust"></i>&nbsp;重置
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </form>
+        </div>
+        <!-- Panel Other -->
+
+        <div class="col-sm-12 select-table table-striped">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+</body>
+<script th:inline="javascript">
+    var prod_cate = [[${@dict.getType('prod_cate')}]];
+    var prod_spec = [[${@dict.getType('prod_spec')}]];
+    var parts_cate = [[${@dict.getType('parts_cate')}]];
+    var mould_spec = [[${@dict.getType('mould_spec')}]];
+    var prefix =  "/Basic/BModel";
+
+    $(function() {
+        var options = {
+            uniqueId: "f_id",
+            url: prefix+"/selectAll",
+            sortName: "f_name",
+            sortOrder: "asc",
+            pagination: true,                   //是否显示分页（*）
+            modalName: "部件型号",
+            search: false,
+            clickToSelect:true,
+            singleSelect:true,
+            showExport: true,
+            showColumns:false,
+            showToggle:false,
+            showRefresh:false,
+            sidePagination:'server',
+            onCheckAll: function (rows) {
+                checkRow(rows);
+            },
+            onUncheckAll: function (rows) {
+                checkRow(rows)
+            },
+            onCheck: function (rows) {
+                checkRow(rows)
+            },
+            onUncheck:function(rows){
+                checkRow(rows)
+            },
+            columns: [{
+                checkbox: true
+            },
+                // {
+                //     field: 'f_id',
+                //     title: '部件名称',
+                //     // halign:"center"
+                // },
+                {
+                    field: 'f_name',
+                    title: '部件型号名称',
+                    // halign:"center"
+                },
+                {
+                    field: 'prod_classify_id',
+                    title: '产品类别',
+                    align:"center",
+                    formatter:function(value,row,index){
+                        return $.table.selectDictLabel(prod_cate,value)
+
+                    }
+                },
+                {
+                    field: 'prod_spec_id',
+                    title: '产品尺寸',
+                    // halign:"center"
+                    formatter: function(value, row, index) {
+                        return $.table.selectDictLabel(prod_spec,value)
+                    }
+                },
+                {
+                    field: 'classify_no',
+                    title: '部件类别编码',
+                    align:"center",
+                    formatter:function(value,row,index){
+                        return $.table.selectDictLabel(parts_cate,value)
+                    }
+                },
+                {
+                    field: 'mould_spec_id',
+                    title: '模具规格',
+                    align:"center",
+                    formatter:function(value,row,index){
+                        return $.table.selectDictLabel(mould_spec,value)
+                    }
+                },
+            ]
+        };
+        $.table.init(options);
+    });
+
+    function checkRow(row){
+        $("#modelId").val(row.f_id)
+        $("#modelName").val(row.f_name)
+    }
+
+
+</script>
+<!-- Mirrored from www.zi-han.net/theme/hplus/table_bootstrap.html by HTTrack Website Copier/3.x [XR&CO'2014], Wed, 20 Jan 2016 14:20:06 GMT -->
+</html>

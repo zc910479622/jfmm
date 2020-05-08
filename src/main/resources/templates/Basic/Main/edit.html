@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<style>
+    .select-table{
+        /*padding-bottom: 0px;*/
+    }
+    #form-config-edit .col-sm-8{
+        padding-left: 0px;
+    }
+    #form-config-edit .col-sm-4{
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+    .help-block{
+        display: block;
+        position: absolute;
+        z-index: 10;
+        margin-top: 0px;
+    }
+</style>
+<body>
+<form class="form-horizontal m" id="form-config-edit" name="form-config-edit">
+    <div class="form-group" hidden>
+        <label class="col-sm-4 control-label">id：</label>
+        <div class="col-sm-8">
+            <input id="f_id" name="f_id" class="form-control" type="text" th:value="${mainTZ.f_id}">
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">匹配号：</label>
+        <div class="col-sm-8">
+            <input id="match_no" name="match_no" th:value="${mainTZ.match_no}" class="form-control" type="text">
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">部件名称：</label>
+        <div class="col-sm-8">
+            <input id="f_name" name="f_name" class="form-control" type="text" th:value="${mainTZ.f_name}" readonly>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">部件型号：</label>
+        <div class="col-sm-8">
+            <!--<select id="model_id" name="model_id" onchange="getBmdel_name()" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98">--%>
+                &lt;%&ndash;<option value="">请选择型号</option>&ndash;%&gt;
+            </select>-->
+                <input id="model_id" onclick="selectBmodel()" class="form-control" th:value="${mainTZ.model_name}" type="text" readonly>
+                <input type="hidden" id="model_id_check" name="model_id" th:value="${mainTZ.model_id}" >
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">单位：</label>
+        <div class="col-sm-8">
+            <select id="unit" name="unit" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('unit')}">
+                <option value="">请选择单位</option>
+                <option th:each="dict : ${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">专属模具编号：</label>
+        <div class="col-sm-8">
+            <input id="prop_mould_id" onclick="selectMatchNo()"  class="form-control" type="text" th:value="${mainTZ.f_no}" readonly>
+            <input type="hidden" id="prop_mould_id_check" name="prop_mould_id" th:value="${mainTZ.prop_mould_id}">
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">专属模具型号：</label>
+        <div class="col-sm-8">
+            <input id="prop_model_id" onclick="selectMModel()" class="form-control" type="text" th:value="${mainTZ.mmd_name}" readonly>
+            <input type="hidden" id="prop_model_id_check" name="prop_model_id" th:value="${mainTZ.prop_mmd_id}">
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">铸造类型：</label>
+        <div class="col-sm-8">
+            <select id="cast_type_id" name="cast_type_id" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('cast_type')}">
+                <option value="">请选择类型</option>
+                <option th:each="dict : ${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">模具材料：</label>
+        <div class="col-sm-8">
+            <select id="mould_mater_id" name="mould_mater_id" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('mould_mater')}">
+                <option value="">请选择材料</option>
+<!--                <%=CommonUtils.getDictTypeOption("mould_mater")%>-->
+                <option th:each="dict : ${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">资产状态：</label>
+        <div class="col-sm-8">
+            <select id="assets_state" name="assets_state" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('asset_states')}">
+                <option value="">请选择资产状态</option>
+<!--                <%=CommonUtils.getDictTypeOption("asset_states")%>-->
+                <option th:each="dict : ${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">制造厂家：</label>
+        <div class="col-sm-8">
+            <select id="make_fty_id" name="make_fty_id" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="supps=${@supp.list()}">
+                <option value="">请选择厂家</option>
+<!--                <%&#45;&#45;<%=CommonUtils.getCustListOption()%>&#45;&#45;%>-->
+                <option th:each="supp : ${supps}" th:text="${supp.fName}" th:value="${supp.fId}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">热处理厂家：</label>
+        <div class="col-sm-8">
+            <select id="heat_fty_id" name="heat_fty_id" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="supps=${@supp.list()}">
+                <option value="">请选择厂家</option>
+<!--                <%&#45;&#45;<%=CommonUtils.getCustListOption()%>&#45;&#45;%>-->
+                <option th:each="supp : ${supps}" th:text="${supp.fName}" th:value="${supp.fId}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">是否统计寿命：</label>
+        <div class="col-sm-8">
+            <select id="life_sum" name="life_sum" onchange="set_life()" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="type=${@dict.getType('boolen')}">
+                <option th:each="dict:${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">已用寿命：</label>
+        <div class="col-sm-8">
+            <input id="usages" name="usages" class="form-control" th:value="${mainTZ.usages}" disabled>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">寿命上限：</label>
+        <div class="col-sm-8">
+            <input id="usage_max" name="usage_max" class="form-control" th:value="${mainTZ.usage_max}">
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">所在地：</label>
+        <div class="col-sm-8">
+            <input type="text" id="out_org_name" th:value="${@dept.getfName(mainTZ.location)}" onclick="selectDeptTreeOut()" class="form-control" readonly>
+            <input type="hidden" class="reset-input" name="location" id="location" th:value="${mainTZ.location}">
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">转运状态：</label>
+        <div class="col-sm-8">
+            <select id="trans_state" name="trans_state" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" disabled>
+                <option value="">请选择类型</option>
+<!--                <%=CommonUtils.getDictTypeOption("LZ_TYPE")%>-->
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">是否在库：</label>
+        <div class="col-sm-8">
+            <select id="is_in_library" name="is_in_library" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" disabled>
+<!--                <%&#45;&#45;<option value="">请选择类型</option>&#45;&#45;%>-->
+<!--                <%=CommonUtils.getDictTypeOption("boolen")%>-->
+            </select>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">发生时间：</label>
+        <div class="col-sm-8">
+            <input type="text" class="form-control" id="happen_time" placeholder="发生时间" name="happen_time" th:value="${mainTZ.happen_time}" disabled/>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">开模申请事业部：</label>
+        <div class="col-sm-8">
+            <input type="text" id="in_org_name" th:value="${@dept.getfName(mainTZ.request_org)}" onclick="selectDeptTreeIn()" class="form-control" readonly>
+            <input type="hidden" class="reset-input" name="request_org" id="request_org" th:value="${mainTZ.request_org}">
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">开模费用：</label>
+        <div class="col-sm-8">
+            <input id="make_cost" name="make_cost" class="form-control" th:value="${mainTZ.make_cost}">
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">申请开模时间：</label>
+        <div class="col-sm-8">
+            <input type="text" class="time-input form-control" id="d1" placeholder="申请开模时间" name="d1" th:value="${mainTZ.d1}"/>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">要求到厂时间：</label>
+        <div class="col-sm-8">
+            <input type="text" class="time-input form-control" id="d2" placeholder="要求到厂时间" name="d2" th:value="${mainTZ.d2}"/>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">进厂验收单编号：</label>
+        <div class="col-sm-8">
+            <input id="accep_into_factory_no" name="accep_into_factory_no" class="form-control" th:value="${mainTZ.accep_into_factory_no}">
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">验收单编号：</label>
+        <div class="col-sm-8">
+            <input id="accep_no" name="accep_no" class="form-control" th:value="${mainTZ.accep_no}"/>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">移交单编号：</label>
+        <div class="col-sm-8">
+            <input id="transfer_order_no" name="transfer_order_no" class="form-control" th:value="${mainTZ.transfer_order_no}"/>
+        </div>
+    </div>
+    <div class="form-group col-sm-4">
+        <label class="col-sm-4 control-label">实际到厂时间：</label>
+        <div class="col-sm-8">
+            <input type="text" class="time-input form-control" id="d3" placeholder="实际到厂时间" name="d3" th:value="${mainTZ.d3}"/>
+        </div>
+    </div>
+<!--    <%&#45;&#45;<div class="form-group">&#45;&#45;%>-->
+<!--    <%&#45;&#45;<label class="col-sm-3 control-label">备注：</label>&#45;&#45;%>-->
+<!--    <%&#45;&#45;<div class="col-sm-8">&#45;&#45;%>-->
+<!--    <%&#45;&#45;<textarea id="remark" name="remark" class="form-control"></textarea>&#45;&#45;%>-->
+<!--    <%&#45;&#45;</div>&#45;&#45;%>-->
+<!--    <%&#45;&#45;</div>&#45;&#45;%>-->
+</form>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var parts_cate = [[${@dict.getType('parts_cate')}]];
+    var prefix = "/Basic/Main";
+    $(".checkbox[type='checkbox']").bootstrapSwitch({
+        onText: "是",
+        offText: "否",
+        onColor: "success",
+        offColor: "info",
+        size: "small"
+    });
+
+    $(function () {
+        $("#form-config-edit").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                match_no: {
+                    message: '',
+                    validators: {
+                        notEmpty: {
+                            message: '匹配号不能为空'
+                        }
+                    }
+                },
+                // f_name: {
+                //     message: '',
+                //     validators: {
+                //         notEmpty: {
+                //             message: '部件名称不能为空'
+                //         }
+                //     }
+                // },
+                model_id_check: {
+                    message: '部件型号验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '部件型号不能为空'
+                        }
+                    }
+                },
+                cast_type_id: {
+                    message: '铸造类型验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '铸造类型不能为空'
+                        }
+                    }
+                },
+                mould_mater_id: {
+                    message: '模具材料验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '模具材料不能为空'
+                        }
+                    }
+                },
+                // usage_max: {
+                //     message: '寿命上限验证失败',
+                //     validators: {
+                //         notEmpty: {
+                //             message: '寿命上限不能为空'
+                //         }
+                //     }
+                // },
+                // make_cost: {
+                //     message: '开模费用验证失败',
+                //     validators: {
+                //         notEmpty: {
+                //             message: '开模费用不能为空'
+                //         }
+                //     }
+                // }
+            }
+        })
+        setVal();
+        var bootstrapValidator = $("#form-config-edit").data("bootstrapValidator");
+        bootstrapValidator.validate();
+        bootstrapValidator.isValid();
+    })
+
+    function set_life() {
+        var select = $("#life_sum").val();
+        if (select == 0){
+            // $("#usages").attr("disabled",false);
+            $("#usage_max").attr("disabled",false);
+        } else {
+            // $("#usages").attr("disabled",true);
+            $("#usage_max").attr("disabled",true);
+        }
+    }
+
+    function setVal(){
+        // <%--$("#model_id").selectpicker('val','${mainTZ.model_id}');--%>
+        getBmdel_name('${mainTZ.model_id}');
+        $("#make_fty_id").selectpicker('val',[[${mainTZ.make_fty_id}]]);
+        $("#heat_fty_id").selectpicker('val',[[${mainTZ.heat_fty_id}]]);
+        $("#cast_type_id").selectpicker('val',[[${mainTZ.cast_type_id}]]);
+        $("#mould_mater_id").selectpicker('val',[[${mainTZ.mould_mater_id}]]);
+        $("#unit").selectpicker('val',[[${mainTZ.unit}]]);
+        $("#assets_state").selectpicker('val',[[${mainTZ.assets_state}]]);
+        $("#life_sum").selectpicker('val',[[${mainTZ.life_sum}]]);
+        $("#trans_state").selectpicker('val',[[${mainTZ.trans_state}]]);
+        $("#is_in_library").selectpicker('val',[[${mainTZ.is_in_library}]]);
+    }
+
+    function submitHandler() {
+        var bootstrapValidator = $("#form-config-edit").data("bootstrapValidator");
+        bootstrapValidator.validate();
+        if (bootstrapValidator.isValid()) {
+            $.operate.save(prefix+"/editMainTZ", $('#form-config-edit').serialize());
+        }
+    }
+
+    function getBmdel_name(f_id){
+        $.ajax({
+            url: "/Basic/BModel/selectAll",
+            type: "post",
+            dataType: "json",
+            data:{f_id:f_id==null?$("#model_id_check").val():f_id},
+            success:function (data) {
+                $("#f_name").val(getText(parts_cate,data.rows[0].classify_no));
+            }
+        })
+    }
+
+    function selectDeptTreeOut() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Dept/selectDeptTree/" + ($("#location").val()?$("#location").val():"1"),
+            callBack: doSubmitOut
+        };
+        $.modal.openOptions(options);
+    }
+    function doSubmitOut(index, layero){
+        var body = layer.getChildFrame('body', index);
+        $("#location").val(body.find('#treeId').val());
+        $("#out_org_name").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+
+    function selectDeptTreeIn() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Dept/selectDeptTree/" + ($("#request_org").val()?$("#request_org").val():"1"),
+            callBack: doSubmitIn
+        };
+        $.modal.openOptions(options);
+    }
+    function doSubmitIn(index, layero){
+        var body = layer.getChildFrame('body', index);
+        $("#request_org").val(body.find('#treeId').val());
+        $("#in_org_name").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+
+    function selectMatchNo() {
+        var options = {
+            title: '匹配号选择',
+            width: "1150",
+            url: "/Pop/popMMain",
+            callBack: doSubmitMatchNo
+        };
+        $.modal.openOptions(options);
+    }
+    function doSubmitMatchNo(index, layero){
+        var body = layer.getChildFrame('body', index);
+        $("#prop_mould_id").val(body.find('#fNo').val());
+        $("#prop_mould_id_check").val(body.find('#fId').val());
+        $("#prop_model_id").val(body.find('#fName').val());
+        $("#prop_model_id_check").val(body.find('#modelId').val());
+        layer.close(index);
+    }
+
+    function selectMModel(){
+        var options = {
+            title: '模具型号选择',
+            width: "1150",
+            url: "/Pop/popMMould",
+            callBack: doSubmitMMould
+        };
+        $.modal.openOptions(options);
+    }
+    function doSubmitMMould(index, layero){
+        var body = layer.getChildFrame('body', index);
+        $("#prop_model_id_check").val(body.find('#modelId').val());
+        $("#prop_model_id").val(body.find('#modelName').val());
+        layer.close(index);
+    }
+
+    function selectBmodel(){
+        var options = {
+            title: '部件型号选择',
+            width: "1150",
+            url: "/Pop/popBMould",
+            callBack: doSubmitBModel
+        };
+        $.modal.openOptions(options);
+    }
+    function doSubmitBModel(index, layero){
+        var body = layer.getChildFrame('body', index);
+        $("#model_id").val(body.find("#modelName").val())
+        $("#model_id_check").val(body.find("#modelId").val())
+        layer.close(index);
+        getBmdel_name(body.find("#modelId").val());
+    }
+
+    function getText(obj,value) {
+        var fName = "";
+        $.each(obj,function (i,v) {
+            if (v.fValue==value){
+                fName = v.fLable;
+            }
+        });
+        return fName
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.jinfei.jfmm.dao.mMainMapper">
+    <resultMap id="BaseResultMap" type="com.jinfei.jfmm.model.mMain">
+        <id column="f_id" property="fId" jdbcType="VARCHAR"/>
+        <result column="model_id" property="modelId" jdbcType="VARCHAR"/>
+        <result column="f_no" property="fNo" jdbcType="VARCHAR"/>
+        <result column="cast_type_id" property="castTypeId" jdbcType="VARCHAR"/>
+        <result column="comp_parts" property="comp_parts" jdbcType="VARCHAR"/>
+        <result column="Amortization" property="amortization" jdbcType="TINYINT"/>
+        <association property="mModel" javaType="com.jinfei.jfmm.model.mModel">
+            <result column="f_name" property="fName" jdbcType="VARCHAR"/>
+            <result column="prod_classify_id" property="prodClassifyId" jdbcType="VARCHAR"/>
+            <result column="prod_spec_id" property="prod_spec_id" jdbcType="VARCHAR"/>
+            <result column="spec_id" property="specId" jdbcType="VARCHAR"/>
+            <result column="cust_id" property="custId" jdbcType="VARCHAR"/>
+            <result column="comp_parts" property="comp_parts" jdbcType="VARCHAR"/>
+        </association>
+    </resultMap>
+    <sql id="Base_Column_List">
+    f_id, model_id, f_no, cast_type_id,comp_parts
+  </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from m_main
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </select>
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from m_main
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </delete>
+    <insert id="insert" parameterType="com.jinfei.jfmm.model.mMain">
+    insert into m_main (f_id, model_id, f_no, 
+      cast_type_id,comp_parts)
+    values (#{fId,jdbcType=VARCHAR}, #{modelId,jdbcType=VARCHAR}, #{fNo,jdbcType=VARCHAR}, 
+      #{castTypeId,jdbcType=VARCHAR},#{comp_parts,jdbcType=VARCHAR})
+  </insert>
+    <insert id="insertSelective" parameterType="com.jinfei.jfmm.model.mMain">
+        insert into m_main
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                f_id,
+            </if>
+            <if test="modelId != null">
+                model_id,
+            </if>
+            <if test="fNo != null">
+                f_no,
+            </if>
+            <if test="castTypeId != null">
+                cast_type_id,
+            </if>
+            <if test="comp_parts != null">
+                comp_parts,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="fId != null">
+                #{fId,jdbcType=VARCHAR},
+            </if>
+            <if test="modelId != null">
+                #{modelId,jdbcType=VARCHAR},
+            </if>
+            <if test="fNo != null">
+                #{fNo,jdbcType=VARCHAR},
+            </if>
+            <if test="castTypeId != null">
+                #{castTypeId,jdbcType=VARCHAR},
+            </if>
+            <if test="comp_parts != null">
+                #{comp_parts,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.jinfei.jfmm.model.mMain">
+        update m_main
+        <set>
+            <if test="modelId != null">
+                model_id = #{modelId,jdbcType=VARCHAR},
+            </if>
+            <if test="fNo != null">
+                f_no = #{fNo,jdbcType=VARCHAR},
+            </if>
+            <if test="castTypeId != null">
+                cast_type_id = #{castTypeId,jdbcType=VARCHAR},
+            </if>
+            <if test="comp_parts != null">
+                comp_parts = #{comp_parts,jdbcType=VARCHAR},
+            </if>
+            <if test="amortization != null">
+                Amortization = #{amortization,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where f_id = #{fId,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.jinfei.jfmm.model.mMain">
+    update m_main
+    set model_id = #{modelId,jdbcType=VARCHAR},
+      f_no = #{fNo,jdbcType=VARCHAR},
+      cast_type_id = #{castTypeId,jdbcType=VARCHAR}
+      comp_parts = #{comp_parts,jdbcType=VARCHAR}
+    where f_id = #{fId,jdbcType=VARCHAR}
+  </update>
+    <update id="setAmortization">
+        update m_main
+        set Amortization = #{amortization}
+        where f_no = #{fNo}
+    </update>
+    <update id="setAmortizationTime">
+        update m_main
+        set amortization_time = #{amortizationTime}
+        where f_no = #{fNo}
+    </update>
+    <select id="list" parameterType="com.jinfei.jfmm.model.mMain" resultMap="BaseResultMap">
+        SELECT
+        a.*,b.*
+        FROM m_main a
+        LEFT JOIN  m_model b on a.model_id = b.f_id
+        <where>
+            <if test="fName != null and fName != ''">
+                AND a.f_no like CONCAT('%',#{fName},'%')
+            </if>
+            <if test="castTypeId!=null and castTypeId!=''">
+                AND a.cast_type_id = #{castTypeId}
+            </if>
+        </where>
+        <if test="offset!=null and pageSize!=null">
+            limit #{offset},#{pageSize}
+        </if>
+    </select>
+    <delete id="removeAll" parameterType="java.util.ArrayList">
+        delete from m_main where f_id in
+        <foreach item="item" collection="array" separator="," open="(" close=")" index="">
+            #{item, jdbcType=VARCHAR}
+        </foreach>
+    </delete>
+    <select id="checkFNo" resultType="java.lang.Boolean" parameterType="java.lang.String">
+        select count(f_id) from m_main
+        <where>
+            <if test="fNo!=null and fNo!=''">
+                AND f_no = #{fNo}
+            </if>
+            <if test=" fId != null and fId != '' ">
+                AND f_id != #{fId}
+            </if>
+        </where>
+    </select>
+    <select id="getTotal" resultType="java.lang.Integer">
+        SELECT
+        count(0)
+        FROM
+        m_main a
+        LEFT JOIN m_model b ON a.model_id = b.f_id
+        <where>
+            <if test="fName != null and fName != ''">
+                AND a.f_no like CONCAT('%',#{fName},'%')
+            </if>
+            <if test="castTypeId!=null and castTypeId!=''">
+                AND a.cast_type_id = #{castTypeId}
+            </if>
+        </where>
+    </select>
+    <select id="getMainList" resultMap="BaseResultMap">
+SELECT
+	m_main.*,m_model.prod_classify_id,m_model.prod_spec_id,m_model.spec_id,m_model.cust_id
+FROM
+	m_main
+	LEFT JOIN m_model ON m_model.f_id = m_main.model_id
+	LEFT JOIN m_match ON m_match.m_main_id = m_main.f_id
+	LEFT JOIN b_main ON b_main.match_no = m_match.b_match_no
+	LEFT JOIN l_detl ON l_detl.part_id = b_main.f_id
+	LEFT JOIN l_main ON l_main.f_id = l_detl.main_id
+	WHERE l_main.f_id = #{id}
+	GROUP BY m_main.f_id
+    </select>
+
+</mapper>

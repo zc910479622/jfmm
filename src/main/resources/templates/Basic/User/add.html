@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<body class="white-bg">
+	<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+		<form class="form-horizontal m" id="form-user-add">
+			<div class="form-group">
+				<label class="col-sm-3 control-label ">登录账号：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="text" id="loginName" name="loginName"/>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">部门名称：</label>
+				<div class="col-sm-8">
+					<input id="fPidName" class="form-control treeview-input" onclick="selectDeptTree()" type="text" readonly="true" value="">
+					<input name="deptId" id="fPid" type="hidden" value="">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">职员名称：</label>
+				<div class="col-sm-8">
+					<select id="userName" name="userName" class="selectpicker form-control" style="width: 100%" data-live-search="true" tabindex="-98" th:with="staffs=${@staff.getStaffList()}">
+						<option th:each="staff:${staffs}" th:text="${staff.f_name+'  工号:'+staff.f_no}" th:value="${staff.f_id}"></option>
+					</select>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">密码：</label>
+				<div class="col-sm-8">
+					<input class="form-control" type="password" name="password" id="password">
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-3 control-label">状态：</label>
+				<div class="col-sm-8">
+					<input type="checkbox" id="status" class="checkbox" data-switch-value="Large" data-on-text="启用"
+						   data-off-text="停用" data-off-color="danger" data-on-color="success"/>
+					<input name="status" type="hidden">
+				</div>
+			</div>
+			<!--<div class="form-group">
+				<label class="col-sm-3 control-label">岗位：</label>
+				<div class="col-sm-8">
+					<select id="post" name="post" class="form-control selectpicker" multiple="">
+					</select>
+				</div>
+			</div>-->
+			<div class="form-group">
+				<label class="col-sm-3 control-label">角色：</label>
+				<div class="col-sm-8">
+					<label th:each="role:${roles}" class="check-box">
+						<input name="role" type="checkbox" th:value="${role.roleId}" th:text="${role.roleName}" th:disabled="${role.status == '1'}">
+						</label>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div th:include="include::footer"></div>
+	<script th:inline="javascript">
+		$(".checkbox").bootstrapSwitch({
+			onSwitchChange: function (event, state) {
+				//监听switch change事件，可以根据状态把相应的业务逻辑代码写在这里
+				if (state == true) {
+					$(this).parent().parent().next().val("1");
+				} else {
+					$(this).parent().parent().next().val("0");
+				}
+			}
+		})
+
+		$(".checkbox[type='checkbox']").bootstrapSwitch("toggleState");
+        
+        function submitHandler() {
+			var bootstrapValidator = $("#form-user-add").data('bootstrapValidator');
+			bootstrapValidator.validate();
+			if (bootstrapValidator.isValid()) {
+				add();
+			}
+	    }
+
+        function add() {
+        	var userId = guid();
+        	var deptId = $("input[name='deptId']").val();
+        	var loginName = $("input[name='loginName']").val();
+        	var userName = $("select[name='userName']").val();
+        	var password = $("input[name='password']").val();
+        	var status = $("input[name='status']").is(':checked') == true ? 0 : 1;
+        	var roleIds = $.form.selectCheckeds("role");
+        	$.ajax({
+        		cache : true,
+        		type : "POST",
+        		url :  "/Basic/User/addSave",
+        		data : {
+        			"userId": userId,
+        			"deptId": deptId,
+        			"loginName": loginName,
+        			"userName": userName,
+        			"password": password,
+        			"status": status,
+        			"roleId": roleIds,
+        		},
+        		async : false,
+        		error : function(request) {
+        			$.modal.alertError("系统错误");
+        		},
+        		success : function(data) {
+        			$.operate.successCallback(data);
+        		}
+        	});
+        }
+		$('#form-user-add').bootstrapValidator({
+			message: 'This value is not valid',
+			feedbackIcons: {
+				valid: 'glyphicon glyphicon-ok',
+				invalid: 'glyphicon glyphicon-remove',
+				validating: 'glyphicon glyphicon-refresh'
+			},
+			fields: {
+				loginName: {
+					message: 'The username is not valid',
+					validators: {
+						notEmpty: {message: '登陆账号不能为空'},
+						remote: {
+							url: "/Basic/User/checkLoginName",
+							message: '登陆账号已存在,请重新输入',
+							delay: 1000,//ajax刷新的时间是1秒一次
+							type: 'POST', //自定义搜索数据，默认值搜索当前input value
+							data: function (validator) {
+								return {
+									"loginName": $("#loginName").val()
+								};
+							}
+						}
+					}
+				},
+				userName: {
+					message: 'The username is not valid',
+					validators: {
+						notEmpty: {message: '用户名称不能为空'},
+					},
+				},
+				password: {
+					message: 'The username is not valid',
+					validators: {
+						notEmpty: {message: '密码不能为空'},
+					},
+				},
+			}
+		});
+    </script>
+</body>
+</html>

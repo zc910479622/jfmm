@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:include="include :: header"></head>
+
+<style>
+    .select-table {
+        padding-bottom: 0px;
+    }
+
+    #form-config-MainAdd .col-sm-8, #form-config-DetlAdd .col-sm-8 {
+        padding-left: 0px;
+    }
+
+    #form-config-MainAdd .col-sm-4, #form-config-DetlAdd .col-sm-4 {
+        padding-right: 0px;
+    }
+
+    #form-config-MainAdd .col-sm-3, #form-config-DetlAdd .col-sm-3 {
+        padding-left: 0px;
+        padding-right: 0px;
+    }
+
+    .help-block {
+        display: block;
+        position: absolute;
+        z-index: 99999;
+        margin-top: 0px;
+    }
+
+    .ibox-content {
+        padding-top: 10px;
+    }
+    .has-feedback .form-control{
+        padding-right: 0px;
+    }
+</style>
+<body>
+<div class="wrapper wrapper-content animated fadeInRight ibox-content">
+    <form class="select-table table-striped col-sm-12" id="form-config-MainAdd" name="form-config-add">
+        <p style="font-size: 18px; border-bottom: 1px solid gainsboro;padding-top: 10px" class="col-sm-12">流转单信息</p>
+        <div class="form-group col-sm-3" hidden>
+            <label class="col-sm-4 control-label">流转id：</label>
+            <div class="col-sm-8">
+                <input id="f_id" name="f_id" class="form-control" type="text" placeholder="流转单号" value="">
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">验收单号：</label>
+            <div class="col-sm-8">
+                <input id="bill_no" name="bill_no" class="form-control" type="text" placeholder="流转单号" value=""
+                       disabled="disabled">
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">单据类型：</label>
+            <div class="col-sm-8">
+                <select id="f_type" name="f_type" class="selectpicker form-control" style="width: 100%"
+                        data-live-search="true" tabindex="-98" disabled="disabled" th:with="type=${@dict.getType('doc_TYPE')}">
+                    <option value="">请选择类型</option>
+                    <option th:each="dict : ${type}" th:text="${dict.fLable}" th:value="${dict.fValue}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">发起人：</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="init_man_id" placeholder="发起人" readonly/>
+                <input id="man_id" type="hidden" name="init_man_id">
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">发起时间：</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="init_time" placeholder="发起时间" name="init_time"
+                       disabled="disabled"/>
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">转出部门：</label>
+            <div class="col-sm-8">
+                <input type="text" id="out_org_name" value="" placeholder="转出部门" class="form-control"
+                       disabled="disabled">
+                <input type="hidden" class="reset-input" name="out_org_id" id="out_org_id">
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">转出人：</label>
+            <div class="col-sm-8">
+                <select id="out_man_id" name="out_man_id" class="selectpicker form-control" style="width: 100%"
+                        data-live-search="true" tabindex="-98" disabled="disabled" th:with="type=${@staff.getStaffList()}">
+                    <option value="">请选择类型</option>
+                    <option th:each="staff:${type}" th:text="${staff.f_name}" th:value="${staff.f_id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">实际转出：</label>
+            <div class="col-sm-8">
+                <input type="text" class="form-control" id="out_time" placeholder="实际转出时间" name="out_time"
+                       disabled="disabled"/>
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">计划转入部门：</label>
+            <div class="col-sm-8">
+                <input type="text" id="in_org_name" value="" onclick="selectDeptTreeIn()" placeholder="计划转入部门"
+                       class="form-control" disabled="disabled">
+                <input type="hidden" class="reset-input" name="in_org_id" id="in_org_id">
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">转入人：</label>
+            <div class="col-sm-8">
+                <select id="in_man_id" name="in_man_id" class="selectpicker form-control" style="width: 100%"
+                        data-live-search="true" tabindex="-98" onchange="ChangeMainForm()"th:with="type=${@staff.getStaffList()}">
+                    <option value="">请选择类型</option>
+                    <option th:each="staff:${type}" th:text="${staff.f_name}" th:value="${staff.f_id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group col-sm-3">
+            <label class="col-sm-4 control-label">实际转入时间：</label>
+            <div class="col-sm-8">
+                <input type="text" class="time-input form-control" id="in_time" placeholder="实际转入时间" name="in_time"
+                       onchange="ChangeMainForm()"/>
+            </div>
+        </div>
+    </form>
+
+    <div class="select-table col-sm-12">
+        <p style="font-size: 18px; border-bottom: 1px solid gainsboro;padding-top: 10px" class="col-sm-12">部件列表</p>
+        <div class="col-sm-12 table-striped" style="height: 37%">
+            <table id="bootstrap-table" data-mobile-responsive="true"></table>
+        </div>
+    </div>
+</div>
+<div th:include="include::footer"></div>
+<script th:inline="javascript">
+    var seatList = [[${@seat.getSeatList()}]];
+    var orgList = [[${@dept.deptList()}]];
+    var parts_cate = [[${@dict.getType('parts_cate')}]]
+    var prefix = "/process/LCYS";
+    var imain;
+    var data = new Array();
+    $("#isComplete").change(function () {
+        if (this.checked) {
+            $(this.parentNode).addClass("active")
+            $("#model").removeAttr("readonly");
+        } else {
+            $("#model").attr("readonly", true);
+            $(this.parentNode).removeClass("active")
+        }
+    })
+    $(function () {
+        var options = {
+            uniqueId: "f_id",
+            // data:data,
+            // url: prefix+"/selectAll",
+            // createUrl: prefix + "/add.html",
+            // updateUrl: prefix + "/edit/{id}",
+            // removeUrl: prefix + "/remove",
+            // exportUrl: prefix + "/export",
+            sortName: "match_no",
+            sortOrder: "asc",
+            pagination: true,               //是否显示分页（*）
+            modalName: "部件型号",
+            search: false,
+            showExport: false,
+            showRefresh: false,
+            showToggle: false,
+            showColumns: false,
+            columns: [
+                {
+                    checkbox: true,
+                    formatter: function (value, row, index) {
+                        if (row.rece_time != null && row.rece_time.length > 0  && row.rece_time != '0000-00-00 00:00:00') {
+                            return {disabled:true}
+                        }
+                    }
+                },
+                {
+                    field: 'f_name',
+                    title: '部件名称',
+                    // halign:"center"
+                },
+                {
+                    field: 'match_no',
+                    title: '部件匹配号',
+                    align: "center",
+                },
+                {
+                    field: 'order_no',
+                    title: '成套序号',
+                    align: "center"
+                },
+                // {
+                //     field: 'f_no',
+                //     title: '专属模具编号',
+                //     align:"center"
+                // },
+                // {
+                //     field: 'mmd_name',
+                //     title: '专属模具型号',
+                //     align:"center"
+                // },
+                {
+                    field: 'rece_time',
+                    title: '接收时间',
+                    formatter:function (value, row, index) {
+                        if (value == '0000-00-00 00:00:00' || value == null || value.length <= 0) {
+                            return "-";
+                        } else {
+                            return value;
+                        }
+                    }
+                    // halign:"center"
+                },
+                {
+                    field: 'seat_id',
+                    title: '存放地',
+                    // halign:"center"
+                    formatter: function (value, row, index) {
+                        var seats = [];
+                        var orgs = [];
+                        for (var i = 0; i < seatList.length; i++) {
+                            seats.push(seatList[i].fId);
+                        }
+                        for (var j = 0; j < orgList.length; j++) {
+                            orgs.push(orgList[j].fId);
+                        }
+                        if (seats.indexOf(value) != -1) {
+                            for (var i = 0; i < seatList.length; i++) {
+                                if (seatList[i].fId == value) {
+                                    return seatList[i].fName;
+                                }
+                            }
+                        } else if (orgs.indexOf(value) != -1) {
+                            for (var j = 0; j < orgList.length; j++) {
+                                if (orgList[j].fId == value) {
+                                    return orgList[j].fName;
+                                }
+                            }
+                        }
+                        return "";
+                    }
+                },
+                {
+                    field: 'rece_edit_time',
+                    title: '编辑时间',
+                    align: 'center',
+                    formatter:function (value, row, index) {
+                        if (value == '0000-00-00 00:00:00' || value == null || value.length <= 0) {
+                            return "-";
+                        } else {
+                            return value;
+                        }
+                    }
+                },
+                {
+                    field: 'rece_time',
+                    title: '<a class="btn btn-warning btn-xs " onclick="Receive()"><i class="fa fa-edit"></i>批量接收</a> ',
+                    align: 'center',
+                    formatter: function (value, row, index) {
+                        if (value == '0000-00-00 00:00:00' || value == null || value.length <= 0) {
+                            var actions = [];
+                            actions.push('<a class="btn btn-success btn-xs " onclick="Receive(\'' + row.f_id + '\')"><i class="fa fa-edit"></i>单部件接收</a> ');
+                            return actions.join('');
+                        } else {
+                            return '已接收';
+                        }
+                        // actions.push('<a class="btn btn-danger btn-xs " onclick="$.operate.remove(\'' + row.f_id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                    }
+                }
+            ]
+        };
+        $.table.init(options);
+        $("#bootstrap-table").bootstrapTable("load", data);
+
+        $("#form-config-MainAdd").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                bill_no: {
+                    message: '部件型号名称验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '流转单号不能为空'
+                        }
+                    }
+                },
+                f_type: {
+                    message: '产品类别验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '流转类型不能为空'
+                        }
+                    }
+                }
+            }
+        })
+        formValidator();
+        setValue();
+    })
+
+    var checkRece = [];
+
+    function Receive(f_id) {
+        checkRece = $.common.isEmpty($.table._option.uniqueId) ? $.table.selectFirstColumns() : $.table.selectColumns($.table._option.uniqueId);
+        if (f_id==null&&checkRece.length == 0) {
+            $.modal.alertWarning("请至少选择一条记录");
+            return;
+        }else {
+            // var options = {
+            //     title: '接收部件',
+            //     width: "800",
+            //     url: prefix + "/Receive.jsp?fId=" + f_id,
+            //     callBack: ReceiveCallBack
+            // };
+            // $.modal.openOptions(options);
+            $.modal.open('接收部件',prefix + "/ReceiveTo?fId=" + f_id,"800",null,ReceiveCallBack);
+        }
+    }
+
+    function ReceiveCallBack(index, layero) {
+        var iframeWin = layero.find('iframe')[0];
+        $.ajax({
+            async:false
+        })
+        iframeWin.contentWindow.submitHandler(index);
+    }
+
+    function call(index) {
+        var body = layer.getChildFrame('body', index);
+        // $("#in_man_id").val(body.find('#in_man_id').val());
+        // $("#in_time").val(body.find('#in_time').val());
+        // $("#seat_id").val(body.find('#seat_id').val());
+        // $("#f_id").val(body.find('#f_id').val());
+        if ( body.find('#f_id').val()!=null&&body.find('#f_id').val()!="undefined") {
+            $(data).each(function (i, v) {
+                if (v.f_id == body.find('#f_id').val()) {
+                    v.rece_time = body.find('#in_time').val();
+                    v.seat_id = body.find('#seat_id').val();
+                    v.rece_edit_time = body.find('#rece_edit_time').val();
+                    v.img_path = getCookie("img_path");
+                }
+            })
+        }else {
+            $(checkRece).each(function (j,m) {
+                $(data).each(function (i, v) {
+                    if ( m == v.f_id) {
+                        v.rece_time = body.find('#in_time').val();
+                        v.seat_id = body.find('#seat_id').val();
+                        v.rece_edit_time = body.find('#rece_edit_time').val();
+                        v.img_path = getCookie("img_path");
+                    }
+                })
+            })
+        }
+        $("#bootstrap-table").bootstrapTable("load", data);
+        layer.close(index);
+    }
+
+    function formValidator() {
+        $("#form-config-DetlAdd").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                part_id: {
+                    message: '部件验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '部件不能为空'
+                        }
+                    }
+                },
+                order_no: {
+                    message: '成套序号验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '成套序号不能为空'
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    var removes = new Array();
+
+    function getText(string, value) {
+        var str = string.replace(/></g, ",").split(",");
+        for (var i = 0; i < str.length; i++) {
+            var ret = str[i];
+            var val = ret.substring(ret.indexOf('\'') + 1, ret.indexOf('\'', ret.indexOf('\'') + 1));
+            if (val == value) {
+                return ret.substring(ret.indexOf('>') + 1, ret.indexOf('<', ret.indexOf('>')))
+            }
+        }
+    }
+
+    function setValue() {
+        imain = JSON.parse([[${mainResult.imain}]])[0];
+        $("#f_id").val(imain.f_id);
+        $("#bill_no").val(imain.bill_no);
+        $("#f_type").selectpicker('val', imain.f_type);
+        // $("#init_man_id").selectpicker('val',imain.init_man_id);
+        var users = [[${@user.getUserList()}]];
+        for (var i = 0; i < users.length; i++) {
+            if (users[i].userId == imain.init_man_id) {
+                $("#init_man_id").val(users[i].userName);
+                $("#man_id").val(users[i].userId);
+            }
+        }
+        $("#init_time").val(imain.init_time);
+        $("#plan_out_time").val(imain.plan_out_time);
+        $("#plan_in_time").val(imain.plan_in_time);
+        $("#out_org_id").val(imain.out_org_id);
+        $("#out_org_name").val(imain.out_org_name);
+        $("#out_man_id").selectpicker('val', imain.out_man_id);
+        $("#out_time").val(imain.out_time);
+        $("#in_org_id").val(imain.out_org_id);
+        $("#in_org_name").val(imain.in_org_name);
+        $("#in_man_id").selectpicker('val', imain.in_man_id);
+        $("#in_time").val(imain.in_time);
+        data = JSON.parse([[${mainResult.detls}]]);
+        $("#bootstrap-table").bootstrapTable("load", data);
+    }
+
+    function submitHandler() {
+        var bootstrapValidatorMain = $("#form-config-MainAdd").data("bootstrapValidator");
+        bootstrapValidatorMain.validate();
+        if (bootstrapValidatorMain.isValid()) {
+            $.operate.save(prefix + "/add", {imain: JSON.stringify(imain), detls: JSON.stringify(data)});
+            // $.operate.save(prefix+"/removeDetl",{ids:removes.join(',')});
+        }
+    }
+
+    function selectDeptTreeIn() {
+        var options = {
+            title: '部门选择',
+            width: "380",
+            url: "/Basic/Dept/selectDeptTree/" + ($("#in_org_id").val() ? $("#in_org_id").val() : "0"),
+            callBack: doSubmitIn
+        };
+        $.modal.openOptions(options);
+    }
+
+    function doSubmitIn(index, layero) {
+        var body = layer.getChildFrame('body', index);
+        $("#in_org_id").val(body.find('#treeId').val());
+        $("#in_org_name").val(body.find('#treeName').val());
+        layer.close(index);
+    }
+
+    function ChangeMainForm() {
+        imain.in_man_id = $("#in_man_id").selectpicker('val');
+        imain.in_time = $("#in_time").val();
+    }
+
+    function getCookie(cname)
+    {
+        var ss = document.cookie;
+        var name = cname + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0; i<ca.length; i++)
+        {
+            var c = ca[i].trim();
+            if (c.indexOf(name)==0)
+                return c.substring(name.length,c.length);
+        }
+        return "";
+    }
+
+</script>
+</body>
+</html>
