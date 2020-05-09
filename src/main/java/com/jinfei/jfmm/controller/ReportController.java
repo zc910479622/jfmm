@@ -20,10 +20,7 @@ import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Controller
 @RequestMapping("/Report")
@@ -127,6 +124,7 @@ public class ReportController {
             map.put("location", zcReport.getLocation());
             map.put("requestOrg", zcReport.getRequestOrg());
             map.put("amortization", zcReport.getAmortization());
+            map.put("amortizationTime", zcReport.getAmortizationTime());
             map.put("castTypeId", zcReport.getCastTypeId());
             map.put("prodSpecId", zcReport.getProdSpecId());
             map.put("wCost", zcReport.getwCost());
@@ -530,7 +528,7 @@ public class ReportController {
         List<aOrg> aOrgList = iaOrgService.list(new aOrg());
         List<kSeat> seats = ikSeatService.list();
         int row = List.size();
-        int cell = 16;
+        int cell = 17;
         for (int i = 0; i < row; i++) {
             sheet.createRow(i);
             for (int j = 0; j <= cell; j++) {
@@ -543,18 +541,19 @@ public class ReportController {
                 sheet.getRow(0).getCell(2).setCellValue(new HSSFRichTextString("模具型号"));
                 sheet.getRow(0).getCell(3).setCellValue(new HSSFRichTextString("模具数量"));
                 sheet.getRow(0).getCell(4).setCellValue(new HSSFRichTextString("已摊销"));
-                sheet.getRow(0).getCell(5).setCellValue(new HSSFRichTextString("边模"));
-                sheet.getRow(0).getCell(6).setCellValue(new HSSFRichTextString("库位号"));
-                sheet.getRow(0).getCell(7).setCellValue(new HSSFRichTextString("数量"));
-                sheet.getRow(0).getCell(8).setCellValue(new HSSFRichTextString("模架"));
-                sheet.getRow(0).getCell(9).setCellValue(new HSSFRichTextString("库位号"));
-                sheet.getRow(0).getCell(10).setCellValue(new HSSFRichTextString("数量"));
-                sheet.getRow(0).getCell(11).setCellValue(new HSSFRichTextString("上模"));
-                sheet.getRow(0).getCell(12).setCellValue(new HSSFRichTextString("库位号"));
-                sheet.getRow(0).getCell(13).setCellValue(new HSSFRichTextString("数量"));
-                sheet.getRow(0).getCell(14).setCellValue(new HSSFRichTextString("下模"));
-                sheet.getRow(0).getCell(15).setCellValue(new HSSFRichTextString("库位号"));
-                sheet.getRow(0).getCell(16).setCellValue(new HSSFRichTextString("数量"));
+                sheet.getRow(0).getCell(5).setCellValue(new HSSFRichTextString("摊销时间"));
+                sheet.getRow(0).getCell(6).setCellValue(new HSSFRichTextString("边模"));
+                sheet.getRow(0).getCell(7).setCellValue(new HSSFRichTextString("库位号"));
+                sheet.getRow(0).getCell(8).setCellValue(new HSSFRichTextString("数量"));
+                sheet.getRow(0).getCell(9).setCellValue(new HSSFRichTextString("模架"));
+                sheet.getRow(0).getCell(10).setCellValue(new HSSFRichTextString("库位号"));
+                sheet.getRow(0).getCell(11).setCellValue(new HSSFRichTextString("数量"));
+                sheet.getRow(0).getCell(12).setCellValue(new HSSFRichTextString("上模"));
+                sheet.getRow(0).getCell(13).setCellValue(new HSSFRichTextString("库位号"));
+                sheet.getRow(0).getCell(14).setCellValue(new HSSFRichTextString("数量"));
+                sheet.getRow(0).getCell(15).setCellValue(new HSSFRichTextString("下模"));
+                sheet.getRow(0).getCell(16).setCellValue(new HSSFRichTextString("库位号"));
+                sheet.getRow(0).getCell(17).setCellValue(new HSSFRichTextString("数量"));
             }
             if (i >= 1) {
                 for (aOrg aOrg : aOrgList) {
@@ -564,30 +563,31 @@ public class ReportController {
                 }
                 for (kSeat kSeat : seats) {
                     if (kSeat.getfId().equals(List.get(i - 1).get("BM_rack_position"))) {
-                        sheet.getRow(i).getCell(6).setCellValue(new HSSFRichTextString(kSeat.getfName()));
+                        sheet.getRow(i).getCell(7).setCellValue(new HSSFRichTextString(kSeat.getfName()));
                     }
                     if (kSeat.getfId().equals(List.get(i - 1).get("MJ_rack_position"))) {
-                        sheet.getRow(i).getCell(9).setCellValue(new HSSFRichTextString(kSeat.getfName()));
+                        sheet.getRow(i).getCell(10).setCellValue(new HSSFRichTextString(kSeat.getfName()));
                     }
                     if (kSeat.getfId().equals(List.get(i - 1).get("SM_rack_position"))) {
-                        sheet.getRow(i).getCell(12).setCellValue(new HSSFRichTextString(kSeat.getfName()));
+                        sheet.getRow(i).getCell(13).setCellValue(new HSSFRichTextString(kSeat.getfName()));
                     }
                     if (kSeat.getfId().equals(List.get(i - 1).get("XM_rack_position"))) {
-                        sheet.getRow(i).getCell(15).setCellValue(new HSSFRichTextString(kSeat.getfName()));
+                        sheet.getRow(i).getCell(16).setCellValue(new HSSFRichTextString(kSeat.getfName()));
                     }
                 }
                 sheet.getRow(i).getCell(1).setCellValue(new HSSFRichTextString((String) List.get(i - 1).get("mainName")));
                 sheet.getRow(i).getCell(2).setCellValue(new HSSFRichTextString((String) List.get(i - 1).get("modelName")));
                 sheet.getRow(i).getCell(3).setCellValue((Integer) List.get(i - 1).get("mainNums"));
                 sheet.getRow(i).getCell(4).setCellValue(new HSSFRichTextString((Boolean) List.get(i - 1).get("amortization") ? "已摊销" : "未摊销"));
-                sheet.getRow(i).getCell(5).setCellValue(new HSSFRichTextString((String) List.get(i - 1).get("BM")));
-                sheet.getRow(i).getCell(7).setCellValue((String) List.get(i - 1).get("BM_part_nums"));
-                sheet.getRow(i).getCell(8).setCellValue(new HSSFRichTextString((String) List.get(i - 1).get("MJ")));
-                sheet.getRow(i).getCell(10).setCellValue((String) List.get(i - 1).get("MJ_part_nums"));
-                sheet.getRow(i).getCell(11).setCellValue(new HSSFRichTextString((String) List.get(i - 1).get("SM")));
-                sheet.getRow(i).getCell(13).setCellValue((String) List.get(i - 1).get("SM_part_nums"));
-                sheet.getRow(i).getCell(14).setCellValue(new HSSFRichTextString((String) List.get(i - 1).get("XM")));
-                sheet.getRow(i).getCell(16).setCellValue((String) List.get(i - 1).get("XM_part_nums"));
+                sheet.getRow(i).getCell(5).setCellValue(new HSSFRichTextString(StringUtils.isNull(List.get(i - 1).get("amortizationTime"))?" ":DateUtils.dateYYYY_MM_DD_HH_MM_SS((Date) List.get(i - 1).get("amortizationTime"))));
+                sheet.getRow(i).getCell(6).setCellValue(new HSSFRichTextString((String) List.get(i - 1).get("BM")));
+                sheet.getRow(i).getCell(8).setCellValue((String) List.get(i - 1).get("BM_part_nums"));
+                sheet.getRow(i).getCell(9).setCellValue(new HSSFRichTextString((String) List.get(i - 1).get("MJ")));
+                sheet.getRow(i).getCell(11).setCellValue((String) List.get(i - 1).get("MJ_part_nums"));
+                sheet.getRow(i).getCell(12).setCellValue(new HSSFRichTextString((String) List.get(i - 1).get("SM")));
+                sheet.getRow(i).getCell(14).setCellValue((String) List.get(i - 1).get("SM_part_nums"));
+                sheet.getRow(i).getCell(15).setCellValue(new HSSFRichTextString((String) List.get(i - 1).get("XM")));
+                sheet.getRow(i).getCell(17).setCellValue((String) List.get(i - 1).get("XM_part_nums"));
             }
         }
     }
@@ -683,9 +683,6 @@ public class ReportController {
                     Double feiyong = 0.00;
                     for (Map<String, Object> map : allList) {
                         if (map.get("castTypeId").equals(castType.getfValue()) && map.get("location").equals(locationList.get(j).get(k).getfId())) {
-                            if ((Boolean) map.get("amortization")) {
-                                System.out.println("++++++++++++++++++++++++++++++++++++++++++++++++");
-                            }
                             if ("1".equals(map.get("assetsState"))) {
                                 shizhi += Integer.parseInt(StringUtils.isNotNull(map.get("mainNums")) ? map.get("mainNums").toString() : "0");
                             } else if ("2".equals(map.get("assetsState"))) {
